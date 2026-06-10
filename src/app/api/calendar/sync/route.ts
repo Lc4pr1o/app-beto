@@ -14,14 +14,16 @@ export async function POST() {
       const startTime = new Date(event.start.dateTime);
       const endTime = new Date(event.end?.dateTime ?? event.start.dateTime);
 
-      // Busca ou cria o cliente pelo nome
+      // Busca ou cria o cliente pelo nome (upsert por nome normalizado)
       let client = await prisma.client.findFirst({
         where: { name: { equals: clientName, mode: "insensitive" } },
       });
 
       if (!client) {
+        // Telefone único por cliente: usa o nome em formato numérico como placeholder
+        const phonePlaceholder = `0${Buffer.from(clientName.toLowerCase()).toString("hex").slice(0, 9)}`;
         client = await prisma.client.create({
-          data: { name: clientName, phone: "00000000000" },
+          data: { name: clientName, phone: phonePlaceholder },
         });
       }
 
