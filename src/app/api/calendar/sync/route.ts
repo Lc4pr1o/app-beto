@@ -1,3 +1,5 @@
+export const maxDuration = 60;
+
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { listUpcomingEvents, parseEventTitle } from "@/lib/google-calendar";
