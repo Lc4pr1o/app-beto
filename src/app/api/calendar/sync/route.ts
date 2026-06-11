@@ -2,6 +2,10 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { listUpcomingEvents, parseEventTitle } from "@/lib/google-calendar";
 
+export async function GET() {
+  return POST();
+}
+
 export async function POST() {
   try {
     const events = await listUpcomingEvents(60);
