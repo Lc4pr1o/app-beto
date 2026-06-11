@@ -5,9 +5,10 @@ import { format, startOfWeek, endOfWeek } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Calendar } from "lucide-react";
 import { SyncButton } from "@/components/sync-button";
+import { nowBR } from "@/lib/date";
 
 export default async function AgendaPage() {
-  const today = new Date();
+  const today = nowBR();
   const weekStart = startOfWeek(today, { weekStartsOn: 1 });
   const weekEnd = endOfWeek(today, { weekStartsOn: 1 });
 

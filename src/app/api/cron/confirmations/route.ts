@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { sendText, buildConfirmationMessage } from "@/lib/evolution";
+import { startOfTodayBR } from "@/lib/date";
 
 // Chamado todo dia às 18h via Vercel Cron
 export async function GET(request: Request) {
@@ -9,11 +10,8 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const tomorrow = new Date();
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  tomorrow.setHours(0, 0, 0, 0);
-  const tomorrowEnd = new Date(tomorrow);
-  tomorrowEnd.setHours(23, 59, 59, 999);
+  const tomorrow = new Date(startOfTodayBR().getTime() + 24 * 60 * 60 * 1000);
+  const tomorrowEnd = new Date(tomorrow.getTime() + 24 * 60 * 60 * 1000 - 1);
 
   const appointments = await prisma.appointment.findMany({
     where: {

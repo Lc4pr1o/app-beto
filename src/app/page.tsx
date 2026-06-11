@@ -1,20 +1,19 @@
 export const dynamic = "force-dynamic";
 
 import { prisma } from "@/lib/prisma";
-import { format } from "date-fns";
-import { ptBR } from "date-fns/locale";
 import { Calendar, DollarSign, Users, Clock, AlertCircle } from "lucide-react";
 import { SyncButton } from "@/components/sync-button";
 import { PaymentButton } from "@/components/payment-button";
+import { startOfTodayBR, endOfTodayBR, formatLongDateBR } from "@/lib/date";
 
 async function getDashboardData() {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const todayEnd = new Date();
-  todayEnd.setHours(23, 59, 59, 999);
+  const today = startOfTodayBR();
+  const todayEnd = endOfTodayBR();
 
-  const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-  const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0, 23, 59, 59);
+  const startOfMonth = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), 1));
+  const endOfMonth = new Date(
+    Date.UTC(today.getUTCFullYear(), today.getUTCMonth() + 1, 0, 23, 59, 59)
+  );
 
   const [todayAppointments, pendingPayments, monthRevenue, totalClients] = await Promise.all([
     prisma.appointment.findMany({
@@ -47,16 +46,12 @@ export default async function DashboardPage() {
   const { todayAppointments, pendingPayments, monthRevenue, totalClients } =
     await getDashboardData();
 
-  const today = new Date();
-
   return (
     <div className="p-6 max-w-5xl mx-auto">
       <div className="flex items-center justify-between mb-6">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">Dashboard</h2>
-          <p className="text-gray-500 text-sm capitalize">
-            {format(today, "EEEE, d 'de' MMMM", { locale: ptBR })}
-          </p>
+          <p className="text-gray-500 text-sm capitalize">{formatLongDateBR()}</p>
         </div>
         <SyncButton />
       </div>

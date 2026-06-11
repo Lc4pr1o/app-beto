@@ -4,11 +4,14 @@ import { prisma } from "@/lib/prisma";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { DollarSign, TrendingUp, Clock, CheckCircle } from "lucide-react";
+import { nowBR } from "@/lib/date";
 
 export default async function FinanceiroPage() {
-  const today = new Date();
-  const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-  const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0, 23, 59, 59);
+  const today = nowBR();
+  const startOfMonth = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), 1));
+  const endOfMonth = new Date(
+    Date.UTC(today.getUTCFullYear(), today.getUTCMonth() + 1, 0, 23, 59, 59)
+  );
 
   const [payments, monthStats] = await Promise.all([
     prisma.payment.findMany({

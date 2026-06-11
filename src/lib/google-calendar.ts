@@ -1,4 +1,5 @@
 import { google } from "googleapis";
+import { startOfTodayBR, endOfTodayBR } from "./date";
 
 const oauth2Client = new google.auth.OAuth2(
   process.env.GOOGLE_CLIENT_ID,
@@ -37,10 +38,8 @@ export async function listUpcomingEvents(daysAhead = 30) {
 }
 
 export async function listTodayEvents() {
-  const start = new Date();
-  start.setHours(0, 0, 0, 0);
-  const end = new Date();
-  end.setHours(23, 59, 59, 999);
+  const start = startOfTodayBR();
+  const end = endOfTodayBR();
 
   const res = await calendar.events.list({
     calendarId: process.env.GOOGLE_CALENDAR_ID ?? "primary",
@@ -54,11 +53,8 @@ export async function listTodayEvents() {
 }
 
 export async function listTomorrowEvents() {
-  const start = new Date();
-  start.setDate(start.getDate() + 1);
-  start.setHours(0, 0, 0, 0);
-  const end = new Date(start);
-  end.setHours(23, 59, 59, 999);
+  const start = new Date(startOfTodayBR().getTime() + 24 * 60 * 60 * 1000);
+  const end = new Date(start.getTime() + 24 * 60 * 60 * 1000 - 1);
 
   const res = await calendar.events.list({
     calendarId: process.env.GOOGLE_CALENDAR_ID ?? "primary",

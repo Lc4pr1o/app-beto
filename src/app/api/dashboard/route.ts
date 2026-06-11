@@ -1,14 +1,15 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { startOfTodayBR, endOfTodayBR } from "@/lib/date";
 
 export async function GET() {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const todayEnd = new Date();
-  todayEnd.setHours(23, 59, 59, 999);
+  const today = startOfTodayBR();
+  const todayEnd = endOfTodayBR();
 
-  const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-  const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0, 23, 59, 59);
+  const startOfMonth = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), 1));
+  const endOfMonth = new Date(
+    Date.UTC(today.getUTCFullYear(), today.getUTCMonth() + 1, 0, 23, 59, 59)
+  );
 
   const [todayAppointments, pendingPayments, monthRevenue, totalClients] = await Promise.all([
     prisma.appointment.findMany({
