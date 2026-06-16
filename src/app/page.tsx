@@ -5,7 +5,7 @@ import { format } from "date-fns";
 import { Calendar, DollarSign, Users, Clock, AlertCircle } from "lucide-react";
 import { SyncButton } from "@/components/sync-button";
 import { PaymentButton } from "@/components/payment-button";
-import { startOfTodayBR, endOfTodayBR, formatLongDateBR } from "@/lib/date";
+import { startOfTodayBR, endOfTodayBR, formatLongDateBR, formatTimeBR } from "@/lib/date";
 
 async function getDashboardData() {
   const today = startOfTodayBR();
@@ -101,7 +101,7 @@ export default async function DashboardPage() {
                       {appt.client?.name ?? appt.title}
                     </p>
                     <p className="text-gray-400 text-xs">
-                      {format(appt.startTime, "HH:mm")} – {format(appt.endTime, "HH:mm")}
+                      {formatTimeBR(appt.startTime)} – {formatTimeBR(appt.endTime)}
                     </p>
                   </div>
                   <StatusBadge status={appt.status} />

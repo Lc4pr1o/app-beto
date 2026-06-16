@@ -5,7 +5,7 @@ import { format, startOfWeek, endOfWeek, addWeeks, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
-import { nowBR } from "@/lib/date";
+import { nowBR, formatTimeBR } from "@/lib/date";
 import { NewAppointmentModal } from "@/components/new-appointment-modal";
 import { AppointmentActions } from "@/components/appointment-actions";
 
@@ -142,8 +142,8 @@ export default async function AgendaPage({
                     >
                       <div className="flex items-center gap-3 min-w-0">
                         <span className="text-xs text-gray-400 shrink-0 w-24">
-                          {format(appt.startTime, "HH:mm")} –{" "}
-                          {format(appt.endTime, "HH:mm")}
+                          {formatTimeBR(appt.startTime)} –{" "}
+                          {formatTimeBR(appt.endTime)}
                         </span>
                         <div className="min-w-0">
                           <span className="text-sm font-medium text-gray-800 block truncate">

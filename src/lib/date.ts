@@ -28,3 +28,22 @@ export function formatLongDateBR(date: Date = new Date()): string {
     timeZone: "America/Sao_Paulo",
   }).format(date);
 }
+
+/** Formata apenas o horário no padrão "08:00" usando horário de Brasília. */
+export function formatTimeBR(date: Date): string {
+  return date.toLocaleTimeString("pt-BR", {
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZone: "America/Sao_Paulo",
+  });
+}
+
+/** Formata data no padrão "16/06/2026" usando horário de Brasília. */
+export function formatDateBR(date: Date): string {
+  return date.toLocaleDateString("pt-BR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    timeZone: "America/Sao_Paulo",
+  });
+}

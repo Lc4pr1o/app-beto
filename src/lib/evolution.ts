@@ -27,7 +27,7 @@ export async function sendText(phone: string, message: string) {
 }
 
 export function buildConfirmationMessage(clientName: string, date: Date): string {
-  const hora = date.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+  const hora = date.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit", timeZone: "America/Sao_Paulo" });
   return (
     `Olá ${clientName}! 👋\n\n` +
     `Confirmando seu atendimento *amanhã* às *${hora}*.\n\n` +

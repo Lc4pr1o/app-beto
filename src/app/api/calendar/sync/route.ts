@@ -25,16 +25,10 @@ export async function POST() {
       const startTime = new Date(event.start.dateTime);
       const endTime = new Date(event.end?.dateTime ?? event.start.dateTime);
 
-      let client = await prisma.client.findFirst({
+      // Busca cliente existente — não cria placeholder; clientes são cadastrados pela plataforma
+      const client = await prisma.client.findFirst({
         where: { name: { equals: clientName, mode: "insensitive" } },
       });
-
-      if (!client) {
-        const phonePlaceholder = `0${Buffer.from(clientName.toLowerCase()).toString("hex").slice(0, 9)}`;
-        client = await prisma.client.create({
-          data: { name: clientName, phone: phonePlaceholder },
-        });
-      }
 
       await prisma.appointment.upsert({
         where: { googleEventId: event.id },
@@ -44,10 +38,11 @@ export async function POST() {
           startTime,
           endTime,
           status: event.status === "cancelled" ? "CANCELLED" : "SCHEDULED",
+          ...(client ? { clientId: client.id } : {}),
         },
         create: {
           googleEventId: event.id,
-          clientId: client.id,
+          clientId: client?.id ?? null,
           title: event.summary,
           serviceType,
           startTime,

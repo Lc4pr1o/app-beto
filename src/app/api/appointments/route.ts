@@ -9,6 +9,7 @@ const createSchema = z.object({
   startTime: z.string().datetime(),
   endTime: z.string().datetime(),
   notes: z.string().optional(),
+  amount: z.number().positive().optional(),
 });
 
 export async function GET(req: NextRequest) {
@@ -35,7 +36,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: body.error.flatten() }, { status: 400 });
   }
 
-  const { clientId, serviceType, startTime, endTime, notes } = body.data;
+  const { clientId, serviceType, startTime, endTime, notes, amount } = body.data;
   const start = new Date(startTime);
   const end = new Date(endTime);
 
@@ -71,6 +72,13 @@ export async function POST(req: NextRequest) {
     data: { clientId, serviceType, title, startTime: start, endTime: end, notes },
     include: { client: true },
   });
+
+  // Criar cobrança se solicitado
+  if (amount) {
+    await prisma.payment.create({
+      data: { clientId, appointmentId: appointment.id, amount, status: "PENDING" },
+    });
+  }
 
   // Push para o Google Calendar (best-effort — falha não bloqueia)
   try {

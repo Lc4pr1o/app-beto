@@ -1,9 +1,8 @@
 export const dynamic = "force-dynamic";
 
 import { prisma } from "@/lib/prisma";
-import { format } from "date-fns";
-import { ptBR } from "date-fns/locale";
-import { Users, Phone, Calendar, AlertCircle } from "lucide-react";
+import { formatDateBR } from "@/lib/date";
+import { Users, Phone, Calendar, AlertCircle, UserPlus } from "lucide-react";
 import Link from "next/link";
 
 export default async function ClientesPage() {
@@ -21,17 +20,31 @@ export default async function ClientesPage() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">Clientes</h2>
-          <p className="text-gray-500 text-sm">{clients.length} cadastrados</p>
+          <p className="text-gray-500 text-sm">{clients.length} cadastrado{clients.length !== 1 ? "s" : ""}</p>
         </div>
+        <Link
+          href="/clientes/novo"
+          className="flex items-center gap-2 bg-violet-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-violet-700 transition-colors"
+        >
+          <UserPlus size={16} />
+          Novo Cliente
+        </Link>
       </div>
 
       {clients.length === 0 ? (
         <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
           <Users size={40} className="text-gray-300 mx-auto mb-3" />
-          <p className="text-gray-500">Nenhum cliente ainda.</p>
-          <p className="text-gray-400 text-sm mt-1">
-            Sincronize a agenda para importar clientes automaticamente.
+          <p className="text-gray-600 font-medium">Nenhum cliente cadastrado ainda.</p>
+          <p className="text-gray-400 text-sm mt-1 mb-5">
+            Cadastre o primeiro cliente para começar a agendar.
           </p>
+          <Link
+            href="/clientes/novo"
+            className="inline-flex items-center gap-2 bg-violet-600 text-white px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-violet-700 transition-colors"
+          >
+            <UserPlus size={15} />
+            Cadastrar primeiro cliente
+          </Link>
         </div>
       ) : (
         <div className="bg-white rounded-xl border border-gray-200 divide-y divide-gray-100">
@@ -53,16 +66,14 @@ export default async function ClientesPage() {
                   <div>
                     <p className="font-medium text-gray-900">{client.name}</p>
                     <div className="flex items-center gap-3 mt-0.5">
-                      {client.phone !== "00000000000" && (
-                        <span className="text-xs text-gray-400 flex items-center gap-1">
-                          <Phone size={10} />
-                          {client.phone}
-                        </span>
-                      )}
+                      <span className="text-xs text-gray-400 flex items-center gap-1">
+                        <Phone size={10} />
+                        {client.phone}
+                      </span>
                       {lastAppt && (
                         <span className="text-xs text-gray-400 flex items-center gap-1">
                           <Calendar size={10} />
-                          {format(lastAppt.startTime, "dd/MM/yyyy", { locale: ptBR })}
+                          {formatDateBR(lastAppt.startTime)}
                         </span>
                       )}
                     </div>

@@ -8,6 +8,7 @@ import { Phone, Calendar, DollarSign, MessageSquare, ArrowLeft } from "lucide-re
 import Link from "next/link";
 import { EditClientForm } from "@/components/edit-client-form";
 import { PaymentButton } from "@/components/payment-button";
+import { formatTimeBR, formatDateBR } from "@/lib/date";
 
 export default async function ClientePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -62,9 +63,12 @@ export default async function ClientePage({ params }: { params: Promise<{ id: st
             <ul className="space-y-2">
               {client.appointments.slice(0, 8).map((appt) => (
                 <li key={appt.id} className="flex justify-between items-center text-sm">
-                  <span className="text-gray-700">
-                    {format(appt.startTime, "dd/MM/yyyy HH:mm", { locale: ptBR })}
-                  </span>
+                  <div>
+                    <span className="text-gray-700">
+                      {formatDateBR(appt.startTime)} às {formatTimeBR(appt.startTime)}
+                    </span>
+                    <p className="text-xs text-gray-400">{appt.serviceType}</p>
+                  </div>
                   <StatusBadge status={appt.status} />
                 </li>
               ))}
