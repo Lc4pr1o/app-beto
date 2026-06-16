@@ -12,8 +12,9 @@ oauth2Client.setCredentials({
 
 export const calendar = google.calendar({ version: "v3", auth: oauth2Client });
 
+const CALENDAR_ID = () => process.env.GOOGLE_CALENDAR_ID ?? "primary";
+
 export function parseEventTitle(title: string): { clientName: string; serviceType: string } {
-  // Formato esperado: "João Silva - Massagem Relaxante"
   const parts = title.split(" - ");
   return {
     clientName: parts[0]?.trim() ?? title.trim(),
@@ -21,13 +22,15 @@ export function parseEventTitle(title: string): { clientName: string; serviceTyp
   };
 }
 
+// ─── Leitura ────────────────────────────────────────────────
+
 export async function listUpcomingEvents(daysAhead = 30) {
   const now = new Date();
   const future = new Date();
   future.setDate(future.getDate() + daysAhead);
 
   const res = await calendar.events.list({
-    calendarId: process.env.GOOGLE_CALENDAR_ID ?? "primary",
+    calendarId: CALENDAR_ID(),
     timeMin: now.toISOString(),
     timeMax: future.toISOString(),
     singleEvents: true,
@@ -38,17 +41,13 @@ export async function listUpcomingEvents(daysAhead = 30) {
 }
 
 export async function listTodayEvents() {
-  const start = startOfTodayBR();
-  const end = endOfTodayBR();
-
   const res = await calendar.events.list({
-    calendarId: process.env.GOOGLE_CALENDAR_ID ?? "primary",
-    timeMin: start.toISOString(),
-    timeMax: end.toISOString(),
+    calendarId: CALENDAR_ID(),
+    timeMin: startOfTodayBR().toISOString(),
+    timeMax: endOfTodayBR().toISOString(),
     singleEvents: true,
     orderBy: "startTime",
   });
-
   return res.data.items ?? [];
 }
 
@@ -57,12 +56,69 @@ export async function listTomorrowEvents() {
   const end = new Date(start.getTime() + 24 * 60 * 60 * 1000 - 1);
 
   const res = await calendar.events.list({
-    calendarId: process.env.GOOGLE_CALENDAR_ID ?? "primary",
+    calendarId: CALENDAR_ID(),
     timeMin: start.toISOString(),
     timeMax: end.toISOString(),
     singleEvents: true,
     orderBy: "startTime",
   });
-
   return res.data.items ?? [];
+}
+
+// ─── Escrita ─────────────────────────────────────────────────
+
+export async function createCalendarEvent({
+  title,
+  startTime,
+  endTime,
+  description,
+}: {
+  title: string;
+  startTime: Date;
+  endTime: Date;
+  description?: string;
+}): Promise<string> {
+  const res = await calendar.events.insert({
+    calendarId: CALENDAR_ID(),
+    requestBody: {
+      summary: title,
+      description,
+      start: { dateTime: startTime.toISOString(), timeZone: "America/Sao_Paulo" },
+      end: { dateTime: endTime.toISOString(), timeZone: "America/Sao_Paulo" },
+    },
+  });
+  return res.data.id!;
+}
+
+export async function updateCalendarEvent(
+  googleEventId: string,
+  {
+    title,
+    startTime,
+    endTime,
+    description,
+  }: {
+    title: string;
+    startTime: Date;
+    endTime: Date;
+    description?: string;
+  }
+) {
+  await calendar.events.update({
+    calendarId: CALENDAR_ID(),
+    eventId: googleEventId,
+    requestBody: {
+      summary: title,
+      description,
+      start: { dateTime: startTime.toISOString(), timeZone: "America/Sao_Paulo" },
+      end: { dateTime: endTime.toISOString(), timeZone: "America/Sao_Paulo" },
+    },
+  });
+}
+
+export async function deleteCalendarEvent(googleEventId: string) {
+  await calendar.events.delete({
+    calendarId: CALENDAR_ID(),
+    eventId: googleEventId,
+  });
 }
