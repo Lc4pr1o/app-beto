@@ -8,6 +8,7 @@ import Link from "next/link";
 import { nowBR, formatTimeBR } from "@/lib/date";
 import { NewAppointmentModal } from "@/components/new-appointment-modal";
 import { AppointmentActions } from "@/components/appointment-actions";
+import { ClearAgendaButton } from "@/components/clear-agenda-button";
 
 export default async function AgendaPage({
   searchParams,
@@ -89,6 +90,10 @@ export default async function AgendaPage({
 
           <NewAppointmentModal clients={clients} />
         </div>
+      </div>
+
+      <div className="flex justify-end mb-2">
+        <ClearAgendaButton />
       </div>
 
       <div className="space-y-3">

@@ -2,7 +2,7 @@ export const dynamic = "force-dynamic";
 
 import { prisma } from "@/lib/prisma";
 import { formatDateBR } from "@/lib/date";
-import { Users, Phone, Calendar, AlertCircle, UserPlus } from "lucide-react";
+import { Users, Phone, Calendar, AlertCircle, UserPlus, Chrome } from "lucide-react";
 import Link from "next/link";
 
 export default async function ClientesPage() {
@@ -22,13 +22,22 @@ export default async function ClientesPage() {
           <h2 className="text-2xl font-bold text-gray-900">Clientes</h2>
           <p className="text-gray-500 text-sm">{clients.length} cadastrado{clients.length !== 1 ? "s" : ""}</p>
         </div>
-        <Link
-          href="/clientes/novo"
-          className="flex items-center gap-2 bg-violet-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-violet-700 transition-colors"
-        >
-          <UserPlus size={16} />
-          Novo Cliente
-        </Link>
+        <div className="flex items-center gap-2">
+          <Link
+            href="/clientes/importar"
+            className="flex items-center gap-2 border border-gray-200 text-gray-600 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors"
+          >
+            <Chrome size={15} className="text-blue-500" />
+            Importar do Google
+          </Link>
+          <Link
+            href="/clientes/novo"
+            className="flex items-center gap-2 bg-violet-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-violet-700 transition-colors"
+          >
+            <UserPlus size={16} />
+            Novo Cliente
+          </Link>
+        </div>
       </div>
 
       {clients.length === 0 ? (
