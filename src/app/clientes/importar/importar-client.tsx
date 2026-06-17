@@ -28,14 +28,20 @@ export function ImportarClient() {
   const [selections, setSelections] = useState<Record<number, string>>({});
   const [importing, setImporting] = useState(false);
   const [result, setResult] = useState<{ imported: number; skipped: number } | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     fetch("/api/contacts/list", { cache: "no-store" })
-      .then((r) => {
-        if (r.status === 401) { setNeedsAuth(true); return null; }
-        return r.json();
+      .then(async (r) => {
+        if (r.status === 401) { setNeedsAuth(true); return; }
+        const data = await r.json();
+        if (!r.ok || !Array.isArray(data)) {
+          setError(data?.detail || data?.error || "Erro ao buscar contatos do Google");
+          return;
+        }
+        setContacts(data);
       })
-      .then((data) => { if (data) setContacts(data); })
+      .catch(() => setError("Erro de conexão ao buscar contatos"))
       .finally(() => setLoading(false));
   }, []);
 
@@ -134,6 +140,22 @@ export function ImportarClient() {
           <p className="text-xs text-gray-400 mt-4">
             Acesso somente leitura aos seus contatos. Nenhum dado é alterado no Google.
           </p>
+        </div>
+      </div>
+    );
+  }
+
+  // Tela de erro
+  if (error) {
+    return (
+      <div className="p-6 max-w-lg mx-auto">
+        <Link href="/clientes" className="flex items-center gap-2 text-gray-500 hover:text-gray-700 text-sm mb-6">
+          <ArrowLeft size={14} />
+          Voltar
+        </Link>
+        <div className="bg-white rounded-xl border border-gray-200 p-8 text-center">
+          <h2 className="text-lg font-semibold text-gray-900 mb-2">Não foi possível importar</h2>
+          <p className="text-gray-500 text-sm">{error}</p>
         </div>
       </div>
     );

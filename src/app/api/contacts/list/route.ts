@@ -40,7 +40,9 @@ export async function GET(_req: NextRequest) {
       .filter((c) => c.name && c.phones.length > 0);
 
     return NextResponse.json(contacts);
-  } catch {
-    return NextResponse.json({ error: "Erro ao buscar contatos do Google" }, { status: 500 });
+  } catch (err) {
+    const detail = err instanceof Error ? err.message : String(err);
+    console.error("Erro ao buscar contatos do Google:", detail);
+    return NextResponse.json({ error: "Erro ao buscar contatos do Google", detail }, { status: 500 });
   }
 }
