@@ -24,8 +24,8 @@ export async function GET(req: NextRequest) {
   const existing = await prisma.appointment.findMany({
     where: {
       status: { not: "CANCELLED" },
-      startTime: { gte: businessStart },
-      endTime: { lte: businessEnd },
+      startTime: { lt: businessEnd },
+      endTime: { gt: businessStart },
     },
     select: { startTime: true, endTime: true },
     orderBy: { startTime: "asc" },

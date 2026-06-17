@@ -27,9 +27,10 @@ export default async function FinanceiroPage() {
   ]);
 
   const paid = monthStats.find((s) => s.status === "PAID");
-  const pending = monthStats.find((s) => s.status === "PENDING" || s.status === "SENT");
+  const pendingGroups = monthStats.filter((s) => s.status === "PENDING" || s.status === "SENT");
   const totalPaid = paid?._sum.amount ?? 0;
-  const totalPending = pending?._sum.amount ?? 0;
+  const totalPending = pendingGroups.reduce((sum, s) => sum + (s._sum.amount ?? 0), 0);
+  const pendingCount = pendingGroups.reduce((sum, s) => sum + s._count, 0);
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
@@ -60,7 +61,7 @@ export default async function FinanceiroPage() {
           <p className="text-xl font-bold text-gray-900">
             R$ {totalPending.toFixed(2).replace(".", ",")}
           </p>
-          <p className="text-xs text-gray-400">{pending?._count ?? 0} pendentes</p>
+          <p className="text-xs text-gray-400">{pendingCount} pendentes</p>
         </div>
 
         <div className="bg-white rounded-xl border border-gray-200 p-4 col-span-2 md:col-span-1">

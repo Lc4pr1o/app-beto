@@ -20,22 +20,35 @@ export function EditClientForm({ client }: { client: Client }) {
     notes: client.notes ?? "",
   });
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
 
   async function handleSave() {
     setSaving(true);
-    await fetch(`/api/clients/${client.id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        ...form,
-        phone: form.phone || "00000000000",
-        email: form.email || null,
-        notes: form.notes || null,
-      }),
-    });
-    setSaving(false);
-    setOpen(false);
-    window.location.reload();
+    setError("");
+    try {
+      const res = await fetch(`/api/clients/${client.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...form,
+          phone: form.phone || "00000000000",
+          email: form.email || null,
+          notes: form.notes || null,
+        }),
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        const fieldErrors = data.error?.fieldErrors;
+        setError(fieldErrors?.phone?.[0] ?? fieldErrors?.name?.[0] ?? "Erro ao salvar cliente");
+        return;
+      }
+      setOpen(false);
+      window.location.reload();
+    } catch {
+      setError("Erro de conexão ao salvar");
+    } finally {
+      setSaving(false);
+    }
   }
 
   return (
@@ -88,6 +101,9 @@ export function EditClientForm({ client }: { client: Client }) {
                 />
               </div>
             </div>
+            {error && (
+              <p className="text-xs text-red-600 bg-red-50 px-3 py-2 rounded-lg mt-3">{error}</p>
+            )}
             <div className="flex gap-2 mt-5">
               <button
                 onClick={() => setOpen(false)}

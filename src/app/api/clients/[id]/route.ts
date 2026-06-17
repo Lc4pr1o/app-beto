@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@/generated/prisma/client";
 import { z } from "zod";
 
 export async function GET(_: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -29,6 +30,16 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   const body = updateSchema.safeParse(await req.json());
   if (!body.success) return NextResponse.json({ error: body.error.flatten() }, { status: 400 });
 
-  const client = await prisma.client.update({ where: { id }, data: body.data });
-  return NextResponse.json(client);
+  try {
+    const client = await prisma.client.update({ where: { id }, data: body.data });
+    return NextResponse.json(client);
+  } catch (err) {
+    if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === "P2002") {
+      return NextResponse.json(
+        { error: { fieldErrors: { phone: ["Telefone já cadastrado para outro cliente"] } } },
+        { status: 409 }
+      );
+    }
+    throw err;
+  }
 }

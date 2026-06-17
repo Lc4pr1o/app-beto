@@ -1,4 +1,5 @@
 import axios from "axios";
+import { getCanonicalOrigin } from "./site-url";
 
 const mp = axios.create({
   baseURL: "https://api.mercadopago.com",
@@ -25,13 +26,19 @@ export async function createPixCharge(params: {
       last_name: params.clientName.split(" ").slice(1).join(" ") || "-",
     },
     external_reference: params.externalReference,
+    notification_url: `${getCanonicalOrigin()}/api/payments/webhook`,
   });
 
   const data = res.data;
   return {
-    paymentId: data.id as string,
+    paymentId: String(data.id),
     pixCode: data.point_of_interaction?.transaction_data?.qr_code as string,
     pixQrCode: data.point_of_interaction?.transaction_data?.qr_code_base64 as string,
     status: data.status as string,
   };
+}
+
+export async function getPixPayment(paymentId: string) {
+  const res = await mp.get(`/v1/payments/${paymentId}`);
+  return res.data as { id: number; status: string; external_reference?: string };
 }

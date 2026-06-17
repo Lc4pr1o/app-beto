@@ -80,6 +80,7 @@ model Payment {
   status        PaymentStatus @default(PENDING)
   pixCode       String?
   pixQrCode     String?
+  mpPaymentId   String?       @unique
   linkSentAt    DateTime?
   paidAt        DateTime?
   createdAt     DateTime      @default(now())

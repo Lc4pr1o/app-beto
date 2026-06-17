@@ -36,17 +36,25 @@ export async function POST(req: NextRequest) {
     externalReference: appointmentId,
   });
 
-  const payment = await prisma.payment.create({
-    data: {
-      clientId: client.id,
-      appointmentId,
-      amount,
-      pixCode: pix.pixCode,
-      pixQrCode: pix.pixQrCode,
-      status: "SENT",
-      linkSentAt: new Date(),
-    },
+  // Reaproveita a cobrança pendente do agendamento em vez de duplicar
+  const existingPayment = await prisma.payment.findFirst({
+    where: { appointmentId, status: { in: ["PENDING", "SENT"] } },
   });
+
+  const paymentData = {
+    amount,
+    pixCode: pix.pixCode,
+    pixQrCode: pix.pixQrCode,
+    mpPaymentId: pix.paymentId,
+    status: "SENT" as const,
+    linkSentAt: new Date(),
+  };
+
+  const payment = existingPayment
+    ? await prisma.payment.update({ where: { id: existingPayment.id }, data: paymentData })
+    : await prisma.payment.create({
+        data: { clientId: client.id, appointmentId, ...paymentData },
+      });
 
   if (client.phone && client.phone !== "00000000000") {
     const message = buildPaymentMessage(client.name, amount, pix.pixCode);
