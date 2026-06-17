@@ -2,7 +2,7 @@ export const dynamic = "force-dynamic";
 
 import { prisma } from "@/lib/prisma";
 import { formatDateBR } from "@/lib/date";
-import { Users, Phone, Calendar, AlertCircle, UserPlus, Chrome } from "lucide-react";
+import { Users, Phone, Calendar, AlertCircle, UserPlus, Globe } from "lucide-react";
 import Link from "next/link";
 
 export default async function ClientesPage() {
@@ -27,7 +27,7 @@ export default async function ClientesPage() {
             href="/clientes/importar"
             className="flex items-center gap-2 border border-gray-200 text-gray-600 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors"
           >
-            <Chrome size={15} className="text-blue-500" />
+            <Globe size={15} className="text-blue-500" />
             Importar do Google
           </Link>
           <Link

@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Chrome, Check, Phone, Search } from "lucide-react";
+import { ArrowLeft, Globe, Check, Phone, Search } from "lucide-react";
 
 type Contact = {
   name: string;
@@ -118,7 +118,7 @@ export default function ImportarPage() {
         </Link>
         <div className="bg-white rounded-xl border border-gray-200 p-8 text-center">
           <div className="w-14 h-14 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Chrome size={26} className="text-blue-500" />
+            <Globe size={26} className="text-blue-500" />
           </div>
           <h2 className="text-lg font-semibold text-gray-900 mb-2">Importar Contatos do Google</h2>
           <p className="text-gray-500 text-sm mb-6">
@@ -128,7 +128,7 @@ export default function ImportarPage() {
             href="/api/contacts/auth"
             className="inline-flex items-center gap-2 bg-white border border-gray-300 text-gray-700 px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors shadow-sm"
           >
-            <Chrome size={16} className="text-blue-500" />
+            <Globe size={16} className="text-blue-500" />
             Continuar com Google
           </a>
           <p className="text-xs text-gray-400 mt-4">
