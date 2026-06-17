@@ -1,3 +1,5 @@
+export const maxDuration = 30;
+
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { google } from "googleapis";
@@ -18,13 +20,21 @@ export async function GET(_req: NextRequest) {
 
   try {
     const people = google.people({ version: "v1", auth: oauth2Client });
-    const res = await people.people.connections.list({
-      resourceName: "people/me",
-      pageSize: 500,
-      personFields: "names,phoneNumbers,emailAddresses",
-    });
 
-    const contacts = (res.data.connections ?? [])
+    const connections = [];
+    let pageToken: string | undefined;
+    do {
+      const res = await people.people.connections.list({
+        resourceName: "people/me",
+        pageSize: 1000,
+        personFields: "names,phoneNumbers,emailAddresses",
+        pageToken,
+      });
+      connections.push(...(res.data.connections ?? []));
+      pageToken = res.data.nextPageToken ?? undefined;
+    } while (pageToken);
+
+    const contacts = connections
       .map((c) => {
         const name = c.names?.[0]?.displayName?.trim();
         const phones = (c.phoneNumbers ?? [])

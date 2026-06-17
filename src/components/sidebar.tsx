@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { LayoutDashboard, Users, Calendar, DollarSign, MessageSquare } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { LayoutDashboard, Users, Calendar, DollarSign, MessageSquare, LogOut } from "lucide-react";
 
 const links = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
@@ -14,6 +14,14 @@ const links = [
 
 export function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
+
+  if (pathname === "/login") return null;
+
+  async function handleLogout() {
+    await fetch("/api/auth/logout", { method: "POST" });
+    router.push("/login");
+  }
 
   return (
     <aside className="w-16 md:w-56 bg-violet-700 flex flex-col py-6 shrink-0">
@@ -22,7 +30,7 @@ export function Sidebar() {
         <p className="text-violet-300 text-xs">Agenda & Clientes</p>
       </div>
 
-      <nav className="flex flex-col gap-1 px-2">
+      <nav className="flex flex-col gap-1 px-2 flex-1">
         {links.map(({ href, label, icon: Icon }) => {
           const active = pathname === href;
           return (
@@ -41,6 +49,14 @@ export function Sidebar() {
           );
         })}
       </nav>
+
+      <button
+        onClick={handleLogout}
+        className="flex items-center gap-3 px-3 py-2.5 mx-2 rounded-lg text-sm font-medium text-violet-100 hover:bg-violet-600 transition-colors"
+      >
+        <LogOut size={18} className="shrink-0" />
+        <span className="hidden md:block">Sair</span>
+      </button>
     </aside>
   );
 }
