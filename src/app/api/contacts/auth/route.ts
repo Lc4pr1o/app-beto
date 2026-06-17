@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getCanonicalOrigin } from "@/lib/site-url";
 
 export async function GET(req: NextRequest) {
-  const origin = new URL(req.url).origin;
+  const origin = getCanonicalOrigin(req);
   const redirectUri = `${origin}/api/contacts/callback`;
 
   const params = new URLSearchParams({
