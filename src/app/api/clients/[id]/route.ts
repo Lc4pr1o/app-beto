@@ -47,29 +47,19 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
 
-  const client = await prisma.client.findUnique({
-    where: { id },
-    include: {
-      _count: { select: { appointments: true, payments: true } },
-    },
-  });
+  const client = await prisma.client.findUnique({ where: { id } });
   if (!client) {
     return NextResponse.json({ error: "Cliente não encontrado" }, { status: 404 });
   }
 
-  if (client._count.appointments > 0 || client._count.payments > 0) {
-    return NextResponse.json(
-      {
-        error:
-          "Não é possível excluir: este cliente já possui atendimentos ou pagamentos registrados. Isso protege o histórico financeiro e de agenda.",
-      },
-      { status: 409 }
-    );
-  }
-
+  // Atendimentos, planos e logs são removidos junto com o cliente. Pagamentos
+  // são preservados (órfãos, sem clientId/appointmentId) para não perder o
+  // histórico financeiro — eles continuam contando nos totais do Financeiro.
   await prisma.$transaction([
+    prisma.payment.updateMany({ where: { clientId: id }, data: { clientId: null, appointmentId: null } }),
     prisma.whatsappLog.deleteMany({ where: { clientId: id } }),
     prisma.planSubscription.deleteMany({ where: { clientId: id } }),
+    prisma.appointment.deleteMany({ where: { clientId: id } }),
     prisma.client.delete({ where: { id } }),
   ]);
 

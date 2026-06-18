@@ -123,12 +123,14 @@ export default async function DashboardPage() {
               {pendingPayments.map((p) => (
                 <li key={p.id} className="flex items-center justify-between">
                   <div>
-                    <p className="font-medium text-gray-800 text-sm">{p.client.name}</p>
+                    <p className="font-medium text-gray-800 text-sm">
+                      {p.client?.name ?? <span className="text-gray-400 italic">Cliente excluído</span>}
+                    </p>
                     <p className="text-gray-400 text-xs">
                       R$ {p.amount.toFixed(2).replace(".", ",")}
                     </p>
                   </div>
-                  {p.appointmentId && p.status === "PENDING" && (
+                  {p.appointmentId && p.client && p.status === "PENDING" && (
                     <PaymentButton
                       appointmentId={p.appointmentId}
                       amount={p.amount}

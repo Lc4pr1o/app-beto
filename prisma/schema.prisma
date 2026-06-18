@@ -74,7 +74,7 @@ model Service {
 
 model Payment {
   id            String        @id @default(cuid())
-  clientId      String
+  clientId      String?
   appointmentId String?
   amount        Float
   status        PaymentStatus @default(PENDING)
@@ -85,7 +85,7 @@ model Payment {
   paidAt        DateTime?
   createdAt     DateTime      @default(now())
 
-  client      Client       @relation(fields: [clientId], references: [id])
+  client      Client?      @relation(fields: [clientId], references: [id])
   appointment Appointment? @relation(fields: [appointmentId], references: [id])
 }
 

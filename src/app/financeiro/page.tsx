@@ -98,7 +98,9 @@ export default async function FinanceiroPage() {
             {payments.map((p) => (
               <div key={p.id} className="flex items-center justify-between px-4 py-3">
                 <div>
-                  <p className="text-sm font-medium text-gray-800">{p.client.name}</p>
+                  <p className="text-sm font-medium text-gray-800">
+                    {p.client?.name ?? <span className="text-gray-400 italic">Cliente excluído</span>}
+                  </p>
                   <p className="text-xs text-gray-400">
                     {format(p.createdAt, "dd/MM/yyyy", { locale: ptBR })}
                     {p.appointment && (

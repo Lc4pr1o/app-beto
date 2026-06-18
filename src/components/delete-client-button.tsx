@@ -33,7 +33,9 @@ export function DeleteClientButton({ clientId }: { clientId: string }) {
     return (
       <div className="flex flex-col items-end gap-2">
         <div className="flex items-center gap-2 bg-red-50 border border-red-200 rounded-lg px-3 py-1.5">
-          <span className="text-xs text-red-700 font-medium">Excluir este cliente?</span>
+          <span className="text-xs text-red-700 font-medium max-w-[220px]">
+            Excluir cliente? Atendimentos e mensagens serão removidos. Pagamentos ficam preservados no Financeiro.
+          </span>
           <button
             onClick={handleDelete}
             disabled={loading}
