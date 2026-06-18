@@ -8,6 +8,8 @@ import { Phone, Calendar, DollarSign, MessageSquare, ArrowLeft } from "lucide-re
 import Link from "next/link";
 import { EditClientForm } from "@/components/edit-client-form";
 import { PaymentButton } from "@/components/payment-button";
+import { DeleteClientButton } from "@/components/delete-client-button";
+import { PaymentRowActions } from "@/components/payment-row-actions";
 import { formatTimeBR, formatDateBR } from "@/lib/date";
 
 export default async function ClientePage({ params }: { params: Promise<{ id: string }> }) {
@@ -47,7 +49,10 @@ export default async function ClientePage({ params }: { params: Promise<{ id: st
             </p>
           )}
         </div>
-        <EditClientForm client={client} />
+        <div className="flex items-center gap-2">
+          <EditClientForm client={client} />
+          <DeleteClientButton clientId={client.id} />
+        </div>
       </div>
 
       <div className="grid md:grid-cols-2 gap-6">
@@ -96,7 +101,10 @@ export default async function ClientePage({ params }: { params: Promise<{ id: st
                       {format(p.createdAt, "dd/MM/yyyy", { locale: ptBR })}
                     </span>
                   </div>
-                  <PaymentStatusBadge status={p.status} />
+                  <div className="flex items-center gap-2">
+                    <PaymentStatusBadge status={p.status} />
+                    <PaymentRowActions paymentId={p.id} status={p.status} />
+                  </div>
                 </li>
               ))}
             </ul>

@@ -43,3 +43,35 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     throw err;
   }
 }
+
+export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+
+  const client = await prisma.client.findUnique({
+    where: { id },
+    include: {
+      _count: { select: { appointments: true, payments: true } },
+    },
+  });
+  if (!client) {
+    return NextResponse.json({ error: "Cliente não encontrado" }, { status: 404 });
+  }
+
+  if (client._count.appointments > 0 || client._count.payments > 0) {
+    return NextResponse.json(
+      {
+        error:
+          "Não é possível excluir: este cliente já possui atendimentos ou pagamentos registrados. Isso protege o histórico financeiro e de agenda.",
+      },
+      { status: 409 }
+    );
+  }
+
+  await prisma.$transaction([
+    prisma.whatsappLog.deleteMany({ where: { clientId: id } }),
+    prisma.planSubscription.deleteMany({ where: { clientId: id } }),
+    prisma.client.delete({ where: { id } }),
+  ]);
+
+  return NextResponse.json({ ok: true });
+}

@@ -1,4 +1,5 @@
 import axios from "axios";
+import { interpolate } from "./template";
 
 const api = axios.create({
   baseURL: process.env.EVOLUTION_API_URL,
@@ -26,29 +27,36 @@ export async function sendText(phone: string, message: string) {
   return res.data;
 }
 
-export function buildConfirmationMessage(clientName: string, date: Date): string {
+export const DEFAULT_CONFIRMATION_TEMPLATE =
+  `Olá {{nome}}! 👋\n\n` +
+  `Confirmando seu atendimento *amanhã* às *{{hora}}*.\n\n` +
+  `Responda *SIM* para confirmar ou *NÃO* para cancelar.\n\n` +
+  `Qualquer dúvida, pode chamar! 😊`;
+
+export const DEFAULT_PAYMENT_TEMPLATE =
+  `Olá {{nome}}! Obrigado pela visita! 🙏\n\n` +
+  `Segue o Pix para o pagamento de *R$ {{valor}}*:\n\n` +
+  `\`{{pix}}\`\n\n` +
+  `Qualquer dúvida, estou à disposição!`;
+
+export const DEFAULT_REENGAGEMENT_TEMPLATE =
+  `Oii {{nome}}! Tudo bem? 😊\n\n` +
+  `Faz um tempinho que você não aparece por aqui... que tal agendar uma sessão?\n\n` +
+  `Me chama e a gente marca! 💆‍♀️`;
+
+export function buildConfirmationMessage(clientName: string, date: Date, template?: string | null): string {
   const hora = date.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit", timeZone: "America/Sao_Paulo" });
-  return (
-    `Olá ${clientName}! 👋\n\n` +
-    `Confirmando seu atendimento *amanhã* às *${hora}*.\n\n` +
-    `Responda *SIM* para confirmar ou *NÃO* para cancelar.\n\n` +
-    `Qualquer dúvida, pode chamar! 😊`
-  );
+  return interpolate(template || DEFAULT_CONFIRMATION_TEMPLATE, { nome: clientName, hora });
 }
 
-export function buildPaymentMessage(clientName: string, amount: number, pixCode: string): string {
-  return (
-    `Olá ${clientName}! Obrigado pela visita! 🙏\n\n` +
-    `Segue o Pix para o pagamento de *R$ ${amount.toFixed(2).replace(".", ",")}*:\n\n` +
-    `\`${pixCode}\`\n\n` +
-    `Qualquer dúvida, estou à disposição!`
-  );
+export function buildPaymentMessage(clientName: string, amount: number, pixCode: string, template?: string | null): string {
+  return interpolate(template || DEFAULT_PAYMENT_TEMPLATE, {
+    nome: clientName,
+    valor: amount.toFixed(2).replace(".", ","),
+    pix: pixCode,
+  });
 }
 
-export function buildReengagementMessage(clientName: string): string {
-  return (
-    `Oii ${clientName}! Tudo bem? 😊\n\n` +
-    `Faz um tempinho que você não aparece por aqui... que tal agendar uma sessão?\n\n` +
-    `Me chama e a gente marca! 💆‍♀️`
-  );
+export function buildReengagementMessage(clientName: string, template?: string | null): string {
+  return interpolate(template || DEFAULT_REENGAGEMENT_TEMPLATE, { nome: clientName });
 }

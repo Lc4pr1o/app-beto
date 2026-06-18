@@ -5,6 +5,8 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { DollarSign, TrendingUp, Clock, CheckCircle } from "lucide-react";
 import { nowBR } from "@/lib/date";
+import { NewChargeModal } from "@/components/new-charge-modal";
+import { PaymentRowActions } from "@/components/payment-row-actions";
 
 export default async function FinanceiroPage() {
   const today = nowBR();
@@ -13,7 +15,7 @@ export default async function FinanceiroPage() {
     Date.UTC(today.getUTCFullYear(), today.getUTCMonth() + 1, 0, 23, 59, 59)
   );
 
-  const [payments, monthStats] = await Promise.all([
+  const [payments, monthStats, clients] = await Promise.all([
     prisma.payment.findMany({
       include: { client: true, appointment: true },
       orderBy: { createdAt: "desc" },
@@ -24,6 +26,7 @@ export default async function FinanceiroPage() {
       _sum: { amount: true },
       _count: true,
     }),
+    prisma.client.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true, phone: true } }),
   ]);
 
   const paid = monthStats.find((s) => s.status === "PAID");
@@ -34,11 +37,14 @@ export default async function FinanceiroPage() {
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold text-gray-900">Financeiro</h2>
-        <p className="text-gray-500 text-sm capitalize">
-          {format(today, "MMMM yyyy", { locale: ptBR })}
-        </p>
+      <div className="mb-6 flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900">Financeiro</h2>
+          <p className="text-gray-500 text-sm capitalize">
+            {format(today, "MMMM yyyy", { locale: ptBR })}
+          </p>
+        </div>
+        <NewChargeModal clients={clients} />
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
@@ -105,6 +111,7 @@ export default async function FinanceiroPage() {
                     R$ {p.amount.toFixed(2).replace(".", ",")}
                   </span>
                   <PaymentStatusBadge status={p.status} />
+                  <PaymentRowActions paymentId={p.id} status={p.status} />
                 </div>
               </div>
             ))}

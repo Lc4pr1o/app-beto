@@ -2,12 +2,19 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { createPixCharge } from "@/lib/mercadopago";
 import { sendText, buildPaymentMessage } from "@/lib/evolution";
+import { getSettings } from "@/lib/settings";
 import { z } from "zod";
 
-const schema = z.object({
-  appointmentId: z.string(),
-  amount: z.number().positive(),
-});
+const schema = z
+  .object({
+    appointmentId: z.string().optional(),
+    clientId: z.string().optional(),
+    amount: z.number().positive(),
+    description: z.string().optional(),
+  })
+  .refine((data) => data.appointmentId || data.clientId, {
+    message: "Informe appointmentId ou clientId",
+  });
 
 export async function POST(req: NextRequest) {
   const body = schema.safeParse(await req.json());
@@ -15,31 +22,35 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: body.error.flatten() }, { status: 400 });
   }
 
-  const { appointmentId, amount } = body.data;
+  const { appointmentId, amount, description } = body.data;
 
-  const appointment = await prisma.appointment.findUnique({
-    where: { id: appointmentId },
-    include: { client: true },
-  });
+  const client = appointmentId
+    ? (
+        await prisma.appointment.findUnique({
+          where: { id: appointmentId },
+          include: { client: true },
+        })
+      )?.client
+    : await prisma.client.findUnique({ where: { id: body.data.clientId } });
 
-  if (!appointment?.client) {
-    return NextResponse.json({ error: "Atendimento não encontrado" }, { status: 404 });
+  if (!client) {
+    return NextResponse.json({ error: "Cliente ou atendimento não encontrado" }, { status: 404 });
   }
-
-  const client = appointment.client;
 
   const pix = await createPixCharge({
     clientName: client.name,
     clientEmail: client.email ?? "cliente@semEmail.com",
     amount,
-    description: "Sessão de massagem",
-    externalReference: appointmentId,
+    description: description || "Sessão de massagem",
+    externalReference: appointmentId ?? client.id,
   });
 
   // Reaproveita a cobrança pendente do agendamento em vez de duplicar
-  const existingPayment = await prisma.payment.findFirst({
-    where: { appointmentId, status: { in: ["PENDING", "SENT"] } },
-  });
+  const existingPayment = appointmentId
+    ? await prisma.payment.findFirst({
+        where: { appointmentId, status: { in: ["PENDING", "SENT"] } },
+      })
+    : null;
 
   const paymentData = {
     amount,
@@ -57,7 +68,8 @@ export async function POST(req: NextRequest) {
       });
 
   if (client.phone && client.phone !== "00000000000") {
-    const message = buildPaymentMessage(client.name, amount, pix.pixCode);
+    const settings = await getSettings();
+    const message = buildPaymentMessage(client.name, amount, pix.pixCode, settings.paymentTemplate);
     await sendText(client.phone, message);
 
     await prisma.whatsappLog.create({

@@ -4,13 +4,19 @@ import { prisma } from "@/lib/prisma";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { MessageSquare, CheckCircle, Clock, RefreshCw } from "lucide-react";
+import { getSettings } from "@/lib/settings";
+import { MessageSettingsForm } from "@/components/message-settings-form";
+import { MessageTriggerButtons } from "@/components/message-trigger-buttons";
 
 export default async function MensagensPage() {
-  const logs = await prisma.whatsappLog.findMany({
-    include: { client: true },
-    orderBy: { sentAt: "desc" },
-    take: 100,
-  });
+  const [logs, settings] = await Promise.all([
+    prisma.whatsappLog.findMany({
+      include: { client: true },
+      orderBy: { sentAt: "desc" },
+      take: 100,
+    }),
+    getSettings(),
+  ]);
 
   const stats = {
     total: logs.length,
@@ -21,9 +27,19 @@ export default async function MensagensPage() {
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
+      <div className="mb-6 flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900">Mensagens</h2>
+          <p className="text-gray-500 text-sm">Histórico e configurações de envio via WhatsApp</p>
+        </div>
+      </div>
+
       <div className="mb-6">
-        <h2 className="text-2xl font-bold text-gray-900">Mensagens</h2>
-        <p className="text-gray-500 text-sm">Histórico de envios via WhatsApp</p>
+        <MessageTriggerButtons />
+      </div>
+
+      <div className="mb-8">
+        <MessageSettingsForm settings={settings} />
       </div>
 
       <div className="grid grid-cols-3 gap-4 mb-8">

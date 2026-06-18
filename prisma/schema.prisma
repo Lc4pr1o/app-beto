@@ -107,6 +107,17 @@ model SyncLog {
   errors          String?
 }
 
+model Settings {
+  id                          String   @id @default("singleton")
+  confirmationTemplate        String?
+  paymentTemplate             String?
+  reengagementTemplate        String?
+  confirmationDaysBefore      Int      @default(1)
+  reengagementInactivityDays  Int      @default(15)
+  reengagementCooldownDays    Int      @default(15)
+  updatedAt                   DateTime @updatedAt
+}
+
 enum AppointmentStatus {
   SCHEDULED
   CONFIRMED

@@ -5,10 +5,12 @@ import { Send } from "lucide-react";
 
 export function PaymentButton({
   appointmentId,
+  clientId,
   amount,
   clientName,
 }: {
-  appointmentId: string;
+  appointmentId?: string;
+  clientId?: string;
   amount: number;
   clientName: string;
 }) {
@@ -22,7 +24,7 @@ export function PaymentButton({
       const res = await fetch("/api/payments/send", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ appointmentId, amount }),
+        body: JSON.stringify({ appointmentId, clientId, amount }),
       });
       if (res.ok) setSent(true);
     } finally {
