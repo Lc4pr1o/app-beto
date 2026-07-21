@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { LayoutDashboard, Users, Calendar, DollarSign, MessageSquare, LogOut } from "lucide-react";
+import { LayoutDashboard, Users, Calendar, DollarSign, MessageSquare, LogOut, Package } from "lucide-react";
 
 const links = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
@@ -10,6 +10,7 @@ const links = [
   { href: "/agenda", label: "Agenda", icon: Calendar },
   { href: "/financeiro", label: "Financeiro", icon: DollarSign },
   { href: "/mensagens", label: "Mensagens", icon: MessageSquare },
+  { href: "/servicos", label: "Serviços", icon: Package },
 ];
 
 export function Sidebar() {
@@ -32,7 +33,7 @@ export function Sidebar() {
 
       <nav className="flex flex-col gap-1 px-2 flex-1">
         {links.map(({ href, label, icon: Icon }) => {
-          const active = pathname === href;
+          const active = href === "/" ? pathname === "/" : pathname.startsWith(href);
           return (
             <Link
               key={href}

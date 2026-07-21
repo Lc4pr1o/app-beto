@@ -33,6 +33,9 @@ export function NewAppointmentModal({ clients: initialClients }: { clients: Clie
   const [createPayment, setCreatePayment] = useState(false);
   const [paymentAmount, setPaymentAmount] = useState("");
 
+  // Recorrência semanal
+  const [repeatWeeks, setRepeatWeeks] = useState(0);
+
   // Estado assíncrono
   const [services, setServices] = useState<Service[]>([]);
   const [slots, setSlots] = useState<Slot[]>([]);
@@ -88,6 +91,7 @@ export function NewAppointmentModal({ clients: initialClients }: { clients: Clie
     setNewClientPhone("");
     setNewClientError("");
     setCreatePayment(false);
+    setRepeatWeeks(0);
   }
 
   function handleClose() {
@@ -141,6 +145,7 @@ export function NewAppointmentModal({ clients: initialClients }: { clients: Clie
           endTime: selectedSlot.end,
           notes: notes || undefined,
           amount: createPayment && paymentAmount ? Number(paymentAmount) : undefined,
+          repeatWeeks: repeatWeeks > 0 ? repeatWeeks : undefined,
         }),
       });
 
@@ -373,6 +378,34 @@ export function NewAppointmentModal({ clients: initialClients }: { clients: Clie
                   className="w-32 border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-300 bg-white"
                 />
                 <span className="text-xs text-gray-400">Valor da sessão</span>
+              </div>
+            )}
+          </div>
+
+          {/* Repetição semanal */}
+          <div className="border border-gray-100 rounded-lg p-3 bg-gray-50">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={repeatWeeks > 0}
+                onChange={(e) => setRepeatWeeks(e.target.checked ? 4 : 0)}
+                className="accent-violet-600"
+              />
+              <span className="text-sm font-medium text-gray-700">Repetir semanalmente</span>
+            </label>
+            {repeatWeeks > 0 && (
+              <div className="mt-3 flex items-center gap-2">
+                <span className="text-sm text-gray-500">Por</span>
+                <select
+                  value={repeatWeeks}
+                  onChange={(e) => setRepeatWeeks(Number(e.target.value))}
+                  className="border border-gray-200 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-300 bg-white"
+                >
+                  {[2, 3, 4, 6, 8, 12].map((w) => (
+                    <option key={w} value={w}>{w} semanas</option>
+                  ))}
+                </select>
+                <span className="text-xs text-gray-400">({repeatWeeks} agendamentos no total)</span>
               </div>
             )}
           </div>

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { updateCalendarEvent, deleteCalendarEvent } from "@/lib/google-calendar";
+import { sendText, buildNoShowMessage } from "@/lib/evolution";
+import { getSettings } from "@/lib/settings";
 import { z } from "zod";
 
 const updateSchema = z.object({
@@ -9,7 +11,9 @@ const updateSchema = z.object({
   startTime: z.string().datetime().optional(),
   endTime: z.string().datetime().optional(),
   notes: z.string().optional().nullable(),
+  sessionNotes: z.string().optional().nullable(),
   cancelReason: z.string().optional(),
+  noShow: z.string().optional(),
 });
 
 export async function PATCH(
@@ -30,7 +34,7 @@ export async function PATCH(
     return NextResponse.json({ error: "Agendamento não encontrado" }, { status: 404 });
   }
 
-  const data = body.data;
+  const { noShow, ...data } = body.data;
   const startTime = data.startTime ? new Date(data.startTime) : existing.startTime;
   const endTime = data.endTime ? new Date(data.endTime) : existing.endTime;
   const serviceType = data.serviceType ?? existing.serviceType;
@@ -73,6 +77,20 @@ export async function PATCH(
     data: { ...data, startTime, endTime, title },
     include: { client: true },
   });
+
+  // Enviar mensagem de não-compareceu (best-effort)
+  if (noShow === "true" && existing.client) {
+    try {
+      const settings = await getSettings();
+      const msg = buildNoShowMessage(existing.client.name, (settings as any).noShowTemplate ?? null);
+      await sendText(existing.client.phone, msg);
+      await prisma.whatsappLog.create({
+        data: { clientId: existing.client.id, type: "NO_SHOW", message: msg, status: "sent" },
+      });
+    } catch {
+      // best-effort
+    }
+  }
 
   // Sincronizar com GCal (best-effort)
   if (existing.googleEventId) {

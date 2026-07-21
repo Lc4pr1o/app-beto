@@ -12,9 +12,12 @@ const updateSchema = z.object({
   confirmationTemplate: z.string().optional().nullable(),
   paymentTemplate: z.string().optional().nullable(),
   reengagementTemplate: z.string().optional().nullable(),
+  noShowTemplate: z.string().optional().nullable(),
   confirmationDaysBefore: z.number().int().min(0).max(30).optional(),
+  confirmationSendHour: z.number().int().min(0).max(23).optional(),
   reengagementInactivityDays: z.number().int().min(1).max(365).optional(),
   reengagementCooldownDays: z.number().int().min(1).max(365).optional(),
+  monthlyGoal: z.number().min(0).optional().nullable(),
 });
 
 export async function PATCH(req: NextRequest) {

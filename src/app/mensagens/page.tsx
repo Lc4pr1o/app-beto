@@ -23,6 +23,7 @@ export default async function MensagensPage() {
     confirmation: logs.filter((l) => l.type === "CONFIRMATION").length,
     payment: logs.filter((l) => l.type === "PAYMENT_LINK").length,
     reengagement: logs.filter((l) => l.type === "REENGAGEMENT").length,
+    noShow: logs.filter((l) => l.type === ("NO_SHOW" as string)).length,
   };
 
   return (
@@ -42,7 +43,7 @@ export default async function MensagensPage() {
         <MessageSettingsForm settings={settings} />
       </div>
 
-      <div className="grid grid-cols-3 gap-4 mb-8">
+      <div className="grid grid-cols-4 gap-4 mb-8">
         <div className="bg-white rounded-xl border border-gray-200 p-4 text-center">
           <p className="text-2xl font-bold text-blue-600">{stats.confirmation}</p>
           <p className="text-xs text-gray-500 mt-1">Confirmações</p>
@@ -54,6 +55,10 @@ export default async function MensagensPage() {
         <div className="bg-white rounded-xl border border-gray-200 p-4 text-center">
           <p className="text-2xl font-bold text-purple-600">{stats.reengagement}</p>
           <p className="text-xs text-gray-500 mt-1">Reengajamentos</p>
+        </div>
+        <div className="bg-white rounded-xl border border-gray-200 p-4 text-center">
+          <p className="text-2xl font-bold text-orange-600">{stats.noShow}</p>
+          <p className="text-xs text-gray-500 mt-1">Não compareceu</p>
         </div>
       </div>
 
@@ -96,6 +101,7 @@ function MessageTypeBadge({ type }: { type: string }) {
     CONFIRMATION: { label: "Confirmação", className: "bg-blue-100 text-blue-700" },
     PAYMENT_LINK: { label: "Pagamento", className: "bg-amber-100 text-amber-700" },
     REENGAGEMENT: { label: "Reengajamento", className: "bg-purple-100 text-purple-700" },
+    NO_SHOW: { label: "Não compareceu", className: "bg-orange-100 text-orange-700" },
   };
   const s = map[type] ?? { label: type, className: "bg-gray-100 text-gray-600" };
   return <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${s.className}`}>{s.label}</span>;

@@ -12,9 +12,12 @@ type Settings = {
   confirmationTemplate: string | null;
   paymentTemplate: string | null;
   reengagementTemplate: string | null;
+  noShowTemplate: string | null;
   confirmationDaysBefore: number;
+  confirmationSendHour: number;
   reengagementInactivityDays: number;
   reengagementCooldownDays: number;
+  monthlyGoal: number | null;
 };
 
 export function MessageSettingsForm({ settings }: { settings: Settings }) {
@@ -22,9 +25,12 @@ export function MessageSettingsForm({ settings }: { settings: Settings }) {
     confirmationTemplate: settings.confirmationTemplate ?? "",
     paymentTemplate: settings.paymentTemplate ?? "",
     reengagementTemplate: settings.reengagementTemplate ?? "",
+    noShowTemplate: settings.noShowTemplate ?? "",
     confirmationDaysBefore: settings.confirmationDaysBefore,
+    confirmationSendHour: settings.confirmationSendHour,
     reengagementInactivityDays: settings.reengagementInactivityDays,
     reengagementCooldownDays: settings.reengagementCooldownDays,
+    monthlyGoal: settings.monthlyGoal ?? 0,
   });
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -41,6 +47,8 @@ export function MessageSettingsForm({ settings }: { settings: Settings }) {
           confirmationTemplate: form.confirmationTemplate || null,
           paymentTemplate: form.paymentTemplate || null,
           reengagementTemplate: form.reengagementTemplate || null,
+          noShowTemplate: form.noShowTemplate || null,
+          monthlyGoal: form.monthlyGoal > 0 ? form.monthlyGoal : null,
         }),
       });
       setSaved(true);
@@ -78,11 +86,24 @@ export function MessageSettingsForm({ settings }: { settings: Settings }) {
         onChange={(v) => setForm((f) => ({ ...f, reengagementTemplate: v }))}
       />
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 border-t border-gray-100">
+      <TemplateField
+        label="Não compareceu"
+        hint="Variáveis: {{nome}}"
+        value={form.noShowTemplate}
+        placeholder={`Olá {{nome}}! Notei que você não pôde comparecer hoje. Quando quiser remarcar, é só chamar! 😊`}
+        onChange={(v) => setForm((f) => ({ ...f, noShowTemplate: v }))}
+      />
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-gray-100">
         <NumberField
           label="Confirmar com quantos dias de antecedência"
           value={form.confirmationDaysBefore}
           onChange={(v) => setForm((f) => ({ ...f, confirmationDaysBefore: v }))}
+        />
+        <NumberField
+          label="Hora do envio de confirmações (0–23)"
+          value={form.confirmationSendHour}
+          onChange={(v) => setForm((f) => ({ ...f, confirmationSendHour: v }))}
         />
         <NumberField
           label="Reengajar após X dias inativo"
@@ -96,10 +117,18 @@ export function MessageSettingsForm({ settings }: { settings: Settings }) {
         />
       </div>
 
-      <p className="text-xs text-gray-400">
-        O horário exato do envio diário é fixo (definido na infraestrutura). Essas opções controlam quais
-        atendimentos/clientes entram na lista de envio.
-      </p>
+      <div className="pt-2 border-t border-gray-100">
+        <label className="text-xs text-gray-500 block mb-1">Meta de faturamento mensal (R$) — aparece no Dashboard</label>
+        <input
+          type="number"
+          min={0}
+          step={100}
+          value={form.monthlyGoal || ""}
+          placeholder="Ex: 5000"
+          onChange={(e) => setForm((f) => ({ ...f, monthlyGoal: Number(e.target.value) }))}
+          className="w-full sm:w-48 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-300"
+        />
+      </div>
 
       <div className="flex items-center gap-3">
         <button

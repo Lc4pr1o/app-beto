@@ -10,22 +10,37 @@ import { EditClientForm } from "@/components/edit-client-form";
 import { PaymentButton } from "@/components/payment-button";
 import { DeleteClientButton } from "@/components/delete-client-button";
 import { PaymentRowActions } from "@/components/payment-row-actions";
+import { SendWhatsappModal } from "@/components/send-whatsapp-modal";
+import { ClientTags } from "@/components/client-tags";
 import { formatTimeBR, formatDateBR } from "@/lib/date";
 
 export default async function ClientePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
 
-  const client = await prisma.client.findUnique({
-    where: { id },
-    include: {
-      appointments: { orderBy: { startTime: "desc" } },
-      payments: { orderBy: { createdAt: "desc" } },
-      planSubscriptions: { include: { plan: true }, orderBy: { purchasedAt: "desc" } },
-      whatsappLogs: { orderBy: { sentAt: "desc" }, take: 10 },
-    },
-  });
+  const [client, stats] = await Promise.all([
+    prisma.client.findUnique({
+      where: { id },
+      include: {
+        appointments: { orderBy: { startTime: "desc" } },
+        payments: { orderBy: { createdAt: "desc" } },
+        planSubscriptions: { include: { plan: true }, orderBy: { purchasedAt: "desc" } },
+        whatsappLogs: { orderBy: { sentAt: "desc" }, take: 10 },
+      },
+    }),
+    Promise.all([
+      prisma.payment.aggregate({
+        where: { clientId: id, status: "PAID" },
+        _sum: { amount: true },
+      }),
+      prisma.appointment.count({ where: { clientId: id, status: "DONE" } }),
+      prisma.appointment.count({ where: { clientId: id, status: "CANCELLED" } }),
+    ]),
+  ]);
 
   if (!client) notFound();
+
+  const [lifetimeAgg, sessoesDone, sessoesCanceladas] = stats;
+  const lifetimeValue = lifetimeAgg._sum.amount ?? 0;
 
   const pendingPayments = client.payments.filter((p) => p.status === "PENDING");
 
@@ -48,10 +63,32 @@ export default async function ClientePage({ params }: { params: Promise<{ id: st
               {client.phone}
             </p>
           )}
+          <div className="mt-2">
+            <ClientTags clientId={client.id} initialTags={(client as any).tags ?? []} />
+          </div>
         </div>
         <div className="flex items-center gap-2">
+          <SendWhatsappModal clientId={client.id} clientName={client.name} />
           <EditClientForm client={client} />
           <DeleteClientButton clientId={client.id} />
+        </div>
+      </div>
+
+      {/* Lifetime stats */}
+      <div className="grid grid-cols-3 gap-3 mb-6">
+        <div className="bg-white rounded-xl border border-gray-200 p-4 text-center">
+          <p className="text-xl font-bold text-green-600">
+            R$ {lifetimeValue.toFixed(2).replace(".", ",")}
+          </p>
+          <p className="text-xs text-gray-400 mt-0.5">Total gasto</p>
+        </div>
+        <div className="bg-white rounded-xl border border-gray-200 p-4 text-center">
+          <p className="text-xl font-bold text-violet-600">{sessoesDone}</p>
+          <p className="text-xs text-gray-400 mt-0.5">Sessões realizadas</p>
+        </div>
+        <div className="bg-white rounded-xl border border-gray-200 p-4 text-center">
+          <p className="text-xl font-bold text-gray-500">{sessoesCanceladas}</p>
+          <p className="text-xs text-gray-400 mt-0.5">Cancelamentos</p>
         </div>
       </div>
 

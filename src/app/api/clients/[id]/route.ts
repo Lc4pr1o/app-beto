@@ -23,6 +23,8 @@ const updateSchema = z.object({
   phone: z.string().min(10).optional(),
   email: z.string().email().optional().nullable(),
   notes: z.string().optional().nullable(),
+  birthday: z.string().optional().nullable(),
+  tags: z.array(z.string()).optional(),
 });
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {

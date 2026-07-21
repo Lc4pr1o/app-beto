@@ -4,9 +4,25 @@ import { prisma } from "@/lib/prisma";
 import { formatDateBR } from "@/lib/date";
 import { Users, Phone, Calendar, AlertCircle, UserPlus, Globe } from "lucide-react";
 import Link from "next/link";
+import { Suspense } from "react";
+import { ClientSearch } from "@/components/client-search";
 
-export default async function ClientesPage() {
+export default async function ClientesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string }>;
+}) {
+  const { q } = await searchParams;
+
   const clients = await prisma.client.findMany({
+    where: q
+      ? {
+          OR: [
+            { name: { contains: q, mode: "insensitive" } },
+            { phone: { contains: q } },
+          ],
+        }
+      : undefined,
     include: {
       appointments: { orderBy: { startTime: "desc" }, take: 1 },
       payments: { where: { status: { in: ["PENDING", "SENT"] } } },
@@ -15,14 +31,23 @@ export default async function ClientesPage() {
     orderBy: { name: "asc" },
   });
 
+  const totalClients = q ? undefined : clients.length;
+
   return (
     <div className="p-6 max-w-5xl mx-auto">
       <div className="flex items-center justify-between mb-6">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">Clientes</h2>
-          <p className="text-gray-500 text-sm">{clients.length} cadastrado{clients.length !== 1 ? "s" : ""}</p>
+          <p className="text-gray-500 text-sm">
+            {q
+              ? `${clients.length} resultado${clients.length !== 1 ? "s" : ""} para "${q}"`
+              : `${clients.length} cadastrado${clients.length !== 1 ? "s" : ""}`}
+          </p>
         </div>
         <div className="flex items-center gap-2">
+          <Suspense fallback={null}>
+            <ClientSearch defaultValue={q} />
+          </Suspense>
           <Link
             href="/clientes/importar"
             className="flex items-center gap-2 border border-gray-200 text-gray-600 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors"
@@ -43,17 +68,26 @@ export default async function ClientesPage() {
       {clients.length === 0 ? (
         <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
           <Users size={40} className="text-gray-300 mx-auto mb-3" />
-          <p className="text-gray-600 font-medium">Nenhum cliente cadastrado ainda.</p>
-          <p className="text-gray-400 text-sm mt-1 mb-5">
-            Cadastre o primeiro cliente para começar a agendar.
-          </p>
-          <Link
-            href="/clientes/novo"
-            className="inline-flex items-center gap-2 bg-violet-600 text-white px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-violet-700 transition-colors"
-          >
-            <UserPlus size={15} />
-            Cadastrar primeiro cliente
-          </Link>
+          {q ? (
+            <>
+              <p className="text-gray-600 font-medium">Nenhum cliente encontrado para "{q}".</p>
+              <p className="text-gray-400 text-sm mt-1">Tente outro nome ou telefone.</p>
+            </>
+          ) : (
+            <>
+              <p className="text-gray-600 font-medium">Nenhum cliente cadastrado ainda.</p>
+              <p className="text-gray-400 text-sm mt-1 mb-5">
+                Cadastre o primeiro cliente para começar a agendar.
+              </p>
+              <Link
+                href="/clientes/novo"
+                className="inline-flex items-center gap-2 bg-violet-600 text-white px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-violet-700 transition-colors"
+              >
+                <UserPlus size={15} />
+                Cadastrar primeiro cliente
+              </Link>
+            </>
+          )}
         </div>
       ) : (
         <div className="bg-white rounded-xl border border-gray-200 divide-y divide-gray-100">

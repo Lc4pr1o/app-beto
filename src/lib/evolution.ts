@@ -60,3 +60,11 @@ export function buildPaymentMessage(clientName: string, amount: number, pixCode:
 export function buildReengagementMessage(clientName: string, template?: string | null): string {
   return interpolate(template || DEFAULT_REENGAGEMENT_TEMPLATE, { nome: clientName });
 }
+
+export const DEFAULT_NO_SHOW_TEMPLATE =
+  `Olá {{nome}}! Notei que você não pôde comparecer hoje. 😊\n\n` +
+  `Quando quiser remarcar, é só chamar! Estou à disposição.`;
+
+export function buildNoShowMessage(clientName: string, template?: string | null): string {
+  return interpolate(template || DEFAULT_NO_SHOW_TEMPLATE, { nome: clientName });
+}

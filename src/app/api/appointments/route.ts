@@ -10,6 +10,7 @@ const createSchema = z.object({
   endTime: z.string().datetime(),
   notes: z.string().optional(),
   amount: z.number().positive().optional(),
+  repeatWeeks: z.number().int().min(2).max(52).optional(),
 });
 
 export async function DELETE(req: NextRequest) {
@@ -45,7 +46,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: body.error.flatten() }, { status: 400 });
   }
 
-  const { clientId, serviceType, startTime, endTime, notes, amount } = body.data;
+  const { clientId, serviceType, startTime, endTime, notes, amount, repeatWeeks } = body.data;
   const start = new Date(startTime);
   const end = new Date(endTime);
 
@@ -76,29 +77,35 @@ export async function POST(req: NextRequest) {
 
   const title = `${client.name} - ${serviceType}`;
 
-  // Salvar no banco primeiro
-  const appointment = await prisma.appointment.create({
-    data: { clientId, serviceType, title, startTime: start, endTime: end, notes },
-    include: { client: true },
-  });
+  const durationMs = end.getTime() - start.getTime();
+  const recurrenceId = repeatWeeks ? crypto.randomUUID() : undefined;
 
-  // Criar cobrança se solicitado
-  if (amount) {
-    await prisma.payment.create({
-      data: { clientId, appointmentId: appointment.id, amount, status: "PENDING" },
-    });
-  }
+  // Salvar no banco — inclui ocorrências recorrentes se repeatWeeks > 0
+  const totalOccurrences = repeatWeeks ? repeatWeeks : 1;
+  const createdAppointments = await Promise.all(
+    Array.from({ length: totalOccurrences }, async (_, i) => {
+      const occStart = new Date(start.getTime() + i * 7 * 24 * 60 * 60 * 1000);
+      const occEnd = new Date(occStart.getTime() + durationMs);
+      const appt = await prisma.appointment.create({
+        data: { clientId, serviceType, title, startTime: occStart, endTime: occEnd, notes, recurrenceId },
+        include: { client: true },
+      });
+      if (amount) {
+        await prisma.payment.create({
+          data: { clientId, appointmentId: appt.id, amount, status: "PENDING" },
+        });
+      }
+      if (i === 0) {
+        try {
+          const googleEventId = await createCalendarEvent({ title, startTime: occStart, endTime: occEnd });
+          await prisma.appointment.update({ where: { id: appt.id }, data: { googleEventId } });
+        } catch { /* best-effort */ }
+      }
+      return appt;
+    })
+  );
 
-  // Push para o Google Calendar (best-effort — falha não bloqueia)
-  try {
-    const googleEventId = await createCalendarEvent({ title, startTime: start, endTime: end });
-    await prisma.appointment.update({
-      where: { id: appointment.id },
-      data: { googleEventId },
-    });
-  } catch {
-    // O cron de sync vai recuperar na próxima execução
-  }
+  const appointment = createdAppointments[0];
 
   return NextResponse.json(appointment, { status: 201 });
 }

@@ -6,6 +6,7 @@ import { Calendar, DollarSign, Users, Clock, AlertCircle } from "lucide-react";
 import { SyncButton } from "@/components/sync-button";
 import { PaymentButton } from "@/components/payment-button";
 import { startOfTodayBR, endOfTodayBR, formatLongDateBR, formatTimeBR } from "@/lib/date";
+import { getSettings } from "@/lib/settings";
 
 async function getDashboardData() {
   const today = startOfTodayBR();
@@ -16,7 +17,9 @@ async function getDashboardData() {
     Date.UTC(today.getUTCFullYear(), today.getUTCMonth() + 1, 0, 23, 59, 59)
   );
 
-  const [todayAppointments, pendingPayments, monthRevenue, totalClients] = await Promise.all([
+  const [settings, [todayAppointments, pendingPayments, monthRevenue, totalClients]] = await Promise.all([
+    getSettings(),
+    Promise.all([
     prisma.appointment.findMany({
       where: { startTime: { gte: today, lte: todayEnd }, status: { not: "CANCELLED" } },
       include: { client: true },
@@ -32,7 +35,8 @@ async function getDashboardData() {
       where: { status: "PAID", paidAt: { gte: startOfMonth, lte: endOfMonth } },
       _sum: { amount: true },
     }),
-    prisma.client.count(),
+      prisma.client.count(),
+    ]),
   ]);
 
   return {
@@ -40,12 +44,17 @@ async function getDashboardData() {
     pendingPayments,
     monthRevenue: monthRevenue._sum.amount ?? 0,
     totalClients,
+    monthlyGoal: settings.monthlyGoal ?? null,
   };
 }
 
 export default async function DashboardPage() {
-  const { todayAppointments, pendingPayments, monthRevenue, totalClients } =
+  const { todayAppointments, pendingPayments, monthRevenue, totalClients, monthlyGoal } =
     await getDashboardData();
+
+  const goalPct = monthlyGoal && monthlyGoal > 0
+    ? Math.min(Math.round((monthRevenue / monthlyGoal) * 100), 100)
+    : null;
 
   return (
     <div className="p-6 max-w-5xl mx-auto">
@@ -64,12 +73,28 @@ export default async function DashboardPage() {
           value={String(todayAppointments.length)}
           sub="atendimentos"
         />
-        <StatCard
-          icon={<DollarSign className="text-green-600" size={20} />}
-          label="Receita do mês"
-          value={`R$ ${monthRevenue.toFixed(2).replace(".", ",")}`}
-          sub="recebido"
-        />
+        <div className="bg-white rounded-xl border border-gray-200 p-4">
+          <div className="flex items-center gap-2 mb-2">
+            <DollarSign className="text-green-600" size={20} />
+            <span className="text-xs text-gray-500">Receita do mês</span>
+          </div>
+          <p className="text-xl font-bold text-gray-900">
+            R$ {monthRevenue.toFixed(2).replace(".", ",")}
+          </p>
+          {goalPct !== null ? (
+            <div className="mt-2">
+              <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                <div
+                  className={`h-full rounded-full transition-all ${goalPct >= 100 ? "bg-green-500" : "bg-violet-500"}`}
+                  style={{ width: `${goalPct}%` }}
+                />
+              </div>
+              <p className="text-xs text-gray-400 mt-1">{goalPct}% da meta</p>
+            </div>
+          ) : (
+            <p className="text-xs text-gray-400">recebido</p>
+          )}
+        </div>
         <StatCard
           icon={<AlertCircle className="text-amber-600" size={20} />}
           label="Pagamentos"

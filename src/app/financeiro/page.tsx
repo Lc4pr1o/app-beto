@@ -1,32 +1,54 @@
 export const dynamic = "force-dynamic";
 
 import { prisma } from "@/lib/prisma";
-import { format } from "date-fns";
+import { format, subMonths, startOfMonth, endOfMonth } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { DollarSign, TrendingUp, Clock, CheckCircle } from "lucide-react";
+import { DollarSign, TrendingUp, Clock, CheckCircle, BarChart2, Download } from "lucide-react";
 import { nowBR } from "@/lib/date";
 import { NewChargeModal } from "@/components/new-charge-modal";
 import { PaymentRowActions } from "@/components/payment-row-actions";
+import { RevenueChart } from "@/components/revenue-chart";
+import Link from "next/link";
 
 export default async function FinanceiroPage() {
   const today = nowBR();
-  const startOfMonth = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), 1));
-  const endOfMonth = new Date(
+  const monthStart = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), 1));
+  const monthEnd = new Date(
     Date.UTC(today.getUTCFullYear(), today.getUTCMonth() + 1, 0, 23, 59, 59)
   );
 
-  const [payments, monthStats, clients] = await Promise.all([
+  // Last 6 months for the chart
+  const sixMonthsAgo = startOfMonth(subMonths(today, 5));
+  const chartMonths = Array.from({ length: 6 }, (_, i) => {
+    const d = subMonths(today, 5 - i);
+    return {
+      label: format(d, "MMM", { locale: ptBR }),
+      start: startOfMonth(d),
+      end: endOfMonth(d),
+    };
+  });
+
+  const [payments, monthStats, clients, chartData] = await Promise.all([
     prisma.payment.findMany({
       include: { client: true, appointment: true },
       orderBy: { createdAt: "desc" },
     }),
     prisma.payment.groupBy({
       by: ["status"],
-      where: { createdAt: { gte: startOfMonth, lte: endOfMonth } },
+      where: { createdAt: { gte: monthStart, lte: monthEnd } },
       _sum: { amount: true },
       _count: true,
     }),
     prisma.client.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true, phone: true } }),
+    Promise.all(
+      chartMonths.map(async (m) => {
+        const agg = await prisma.payment.aggregate({
+          where: { status: "PAID", paidAt: { gte: m.start, lte: m.end } },
+          _sum: { amount: true },
+        });
+        return { label: m.label, value: agg._sum.amount ?? 0 };
+      })
+    ),
   ]);
 
   const paid = monthStats.find((s) => s.status === "PAID");
@@ -44,7 +66,16 @@ export default async function FinanceiroPage() {
             {format(today, "MMMM yyyy", { locale: ptBR })}
           </p>
         </div>
-        <NewChargeModal clients={clients} />
+        <div className="flex items-center gap-2">
+          <Link
+            href="/api/financeiro/export"
+            className="flex items-center gap-2 border border-gray-200 text-gray-600 px-3 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors"
+          >
+            <Download size={14} />
+            Exportar CSV
+          </Link>
+          <NewChargeModal clients={clients} />
+        </div>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
@@ -80,6 +111,15 @@ export default async function FinanceiroPage() {
           </p>
           <p className="text-xs text-gray-400">recebido + pendente</p>
         </div>
+      </div>
+
+      {/* Revenue chart */}
+      <div className="bg-white rounded-xl border border-gray-200 p-5 mb-6">
+        <h3 className="font-semibold text-gray-900 flex items-center gap-2 mb-4">
+          <BarChart2 size={16} className="text-violet-600" />
+          Receita dos últimos 6 meses
+        </h3>
+        <RevenueChart data={chartData} />
       </div>
 
       <div className="bg-white rounded-xl border border-gray-200">

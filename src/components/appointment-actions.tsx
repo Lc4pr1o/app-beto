@@ -85,6 +85,14 @@ export function AppointmentActions({
         Concluir
       </button>
       <button
+        onClick={() => updateStatus("CANCELLED", { cancelReason: "Não compareceu", noShow: "true" })}
+        disabled={loading}
+        className="text-xs px-2 py-1 rounded-md bg-orange-50 text-orange-600 hover:bg-orange-100 font-medium disabled:opacity-50 transition-colors"
+        title="Marcar como não compareceu e enviar mensagem"
+      >
+        Faltou
+      </button>
+      <button
         onClick={() => setCancelling(true)}
         disabled={loading}
         className="text-xs px-2 py-1 rounded-md bg-red-50 text-red-600 hover:bg-red-100 font-medium disabled:opacity-50 transition-colors"
