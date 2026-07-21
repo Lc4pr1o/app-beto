@@ -45,18 +45,18 @@ export default async function ClientePage({ params }: { params: Promise<{ id: st
   const pendingPayments = client.payments.filter((p) => p.status === "PENDING");
 
   return (
-    <div className="p-6 max-w-4xl mx-auto">
+    <div className="p-3 sm:p-6 max-w-4xl mx-auto">
       <Link href="/clientes" className="flex items-center gap-2 text-gray-500 hover:text-gray-700 text-sm mb-6">
         <ArrowLeft size={14} />
         Voltar
       </Link>
 
-      <div className="flex items-start gap-4 mb-8">
-        <div className="w-14 h-14 rounded-full bg-violet-100 flex items-center justify-center text-violet-700 font-bold text-xl">
+      <div className="flex flex-wrap items-start gap-4 mb-8">
+        <div className="w-14 h-14 rounded-full bg-violet-100 flex items-center justify-center text-violet-700 font-bold text-xl shrink-0">
           {client.name.charAt(0).toUpperCase()}
         </div>
-        <div className="flex-1">
-          <h2 className="text-2xl font-bold text-gray-900">{client.name}</h2>
+        <div className="flex-1 min-w-0">
+          <h2 className="text-2xl font-bold text-gray-900 truncate">{client.name}</h2>
           {client.phone !== "00000000000" && (
             <p className="text-gray-500 text-sm flex items-center gap-1 mt-1">
               <Phone size={12} />
@@ -67,7 +67,7 @@ export default async function ClientePage({ params }: { params: Promise<{ id: st
             <ClientTags clientId={client.id} initialTags={(client as any).tags ?? []} />
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 w-full sm:w-auto">
           <SendWhatsappModal clientId={client.id} clientName={client.name} />
           <EditClientForm client={client} />
           <DeleteClientButton clientId={client.id} />
@@ -75,20 +75,20 @@ export default async function ClientePage({ params }: { params: Promise<{ id: st
       </div>
 
       {/* Lifetime stats */}
-      <div className="grid grid-cols-3 gap-3 mb-6">
-        <div className="bg-white rounded-xl border border-gray-200 p-4 text-center">
-          <p className="text-xl font-bold text-green-600">
-            R$ {lifetimeValue.toFixed(2).replace(".", ",")}
+      <div className="grid grid-cols-3 gap-2 mb-6">
+        <div className="bg-white rounded-xl border border-gray-200 p-2 sm:p-4 text-center">
+          <p className="text-xs sm:text-xl font-bold text-green-600 truncate tabular-nums">
+            R${lifetimeValue.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ".")}
           </p>
-          <p className="text-xs text-gray-400 mt-0.5">Total gasto</p>
+          <p className="text-xs text-gray-400 mt-0.5 leading-tight">Total gasto</p>
         </div>
-        <div className="bg-white rounded-xl border border-gray-200 p-4 text-center">
-          <p className="text-xl font-bold text-violet-600">{sessoesDone}</p>
-          <p className="text-xs text-gray-400 mt-0.5">Sessões realizadas</p>
+        <div className="bg-white rounded-xl border border-gray-200 p-2 sm:p-4 text-center">
+          <p className="text-xs sm:text-xl font-bold text-violet-600">{sessoesDone}</p>
+          <p className="text-xs text-gray-400 mt-0.5 leading-tight">Sessões</p>
         </div>
-        <div className="bg-white rounded-xl border border-gray-200 p-4 text-center">
-          <p className="text-xl font-bold text-gray-500">{sessoesCanceladas}</p>
-          <p className="text-xs text-gray-400 mt-0.5">Cancelamentos</p>
+        <div className="bg-white rounded-xl border border-gray-200 p-2 sm:p-4 text-center">
+          <p className="text-xs sm:text-xl font-bold text-gray-500">{sessoesCanceladas}</p>
+          <p className="text-xs text-gray-400 mt-0.5 leading-tight">Cancelamentos</p>
         </div>
       </div>
 

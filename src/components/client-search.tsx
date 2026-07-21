@@ -33,7 +33,7 @@ export function ClientSearch({ defaultValue }: { defaultValue?: string }) {
         defaultValue={defaultValue}
         onChange={(e) => update(e.target.value)}
         placeholder="Buscar por nome ou telefone..."
-        className={`pl-8 pr-8 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-300 w-64 bg-white transition-opacity ${
+        className={`pl-8 pr-8 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-300 w-full bg-white transition-opacity ${
           isPending ? "opacity-60" : ""
         }`}
       />

@@ -116,8 +116,8 @@ export default async function AgendaPage({
     }));
 
     return (
-      <div className="p-6 max-w-3xl mx-auto">
-        <div className="flex items-center justify-between mb-6">
+      <div className="p-3 sm:p-6 max-w-3xl mx-auto">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-6">
           <div>
             <h2 className="text-2xl font-bold text-gray-900">Agenda</h2>
             <p className="text-gray-500 text-sm capitalize">
@@ -126,7 +126,7 @@ export default async function AgendaPage({
             </p>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             {/* View toggle */}
             <div className="flex items-center border border-gray-200 rounded-lg overflow-hidden text-xs font-medium">
               <Link
@@ -134,14 +134,14 @@ export default async function AgendaPage({
                 className="flex items-center gap-1.5 px-3 py-2 bg-violet-600 text-white"
               >
                 <Calendar size={13} />
-                Dia
+                <span className="hidden sm:inline">Dia</span>
               </Link>
               <Link
                 href={`/agenda?view=week`}
                 className="flex items-center gap-1.5 px-3 py-2 text-gray-600 hover:bg-gray-50"
               >
                 <List size={13} />
-                Semana
+                <span className="hidden sm:inline">Semana</span>
               </Link>
             </div>
 
@@ -216,7 +216,7 @@ export default async function AgendaPage({
                     hourAppts.map((appt) => (
                       <div
                         key={appt.id}
-                        className="flex items-center justify-between gap-3 bg-white rounded-lg border border-violet-200 px-3 py-2 shadow-sm"
+                        className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 bg-white rounded-lg border border-violet-200 px-3 py-2 shadow-sm"
                       >
                         <div className="flex items-center gap-3 min-w-0">
                           <div className="w-1 h-8 rounded-full bg-violet-500 shrink-0" />
@@ -231,7 +231,7 @@ export default async function AgendaPage({
                             </p>
                           </div>
                         </div>
-                        <div className="flex items-center gap-2 shrink-0">
+                        <div className="flex items-center gap-2 flex-wrap ml-4 sm:ml-0 sm:shrink-0">
                           <StatusBadge status={appt.status} />
                           <AppointmentActions
                             appointmentId={appt.id}
@@ -274,8 +274,8 @@ export default async function AgendaPage({
   const isCurrentWeek = format(weekStart, "yyyy-MM-dd") === currentWeekKey;
 
   return (
-    <div className="p-6 max-w-4xl mx-auto">
-      <div className="flex items-center justify-between mb-6">
+    <div className="p-3 sm:p-6 max-w-4xl mx-auto">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-6">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">Agenda</h2>
           <p className="text-gray-500 text-sm">
@@ -288,7 +288,7 @@ export default async function AgendaPage({
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           {/* View toggle */}
           <div className="flex items-center border border-gray-200 rounded-lg overflow-hidden text-xs font-medium">
             <Link
@@ -296,14 +296,14 @@ export default async function AgendaPage({
               className="flex items-center gap-1.5 px-3 py-2 text-gray-600 hover:bg-gray-50"
             >
               <Calendar size={13} />
-              Dia
+              <span className="hidden sm:inline">Dia</span>
             </Link>
             <Link
               href="/agenda?view=week"
               className="flex items-center gap-1.5 px-3 py-2 bg-violet-600 text-white"
             >
               <List size={13} />
-              Semana
+              <span className="hidden sm:inline">Semana</span>
             </Link>
           </div>
 
@@ -380,16 +380,16 @@ export default async function AgendaPage({
               </div>
 
               {dayAppts.length === 0 ? (
-                <p className="text-gray-300 text-xs ml-10">Sem atendimentos</p>
+                <p className="text-gray-300 text-xs sm:ml-10">Sem atendimentos</p>
               ) : (
-                <ul className="space-y-2.5 ml-10">
+                <ul className="space-y-2.5 sm:ml-10">
                   {dayAppts.map((appt) => (
                     <li
                       key={appt.id}
-                      className="flex items-center justify-between gap-3 py-1"
+                      className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1.5 sm:gap-3 py-1"
                     >
-                      <div className="flex items-center gap-3 min-w-0">
-                        <span className="text-xs text-gray-400 shrink-0 w-24">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <span className="text-xs text-gray-400 shrink-0 w-14 sm:w-24">
                           {formatTimeBR(appt.startTime)} –{" "}
                           {formatTimeBR(appt.endTime)}
                         </span>
@@ -402,7 +402,7 @@ export default async function AgendaPage({
                           </span>
                         </div>
                       </div>
-                      <div className="flex items-center gap-2 shrink-0">
+                      <div className="flex items-center gap-2 flex-wrap sm:shrink-0 pl-16 sm:pl-0">
                         <StatusBadge status={appt.status} />
                         <AppointmentActions
                           appointmentId={appt.id}

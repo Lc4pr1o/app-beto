@@ -27,7 +27,7 @@ export default async function MensagensPage() {
   };
 
   return (
-    <div className="p-6 max-w-4xl mx-auto">
+    <div className="p-3 sm:p-6 max-w-4xl mx-auto">
       <div className="mb-6 flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">Mensagens</h2>
@@ -43,7 +43,7 @@ export default async function MensagensPage() {
         <MessageSettingsForm settings={settings} />
       </div>
 
-      <div className="grid grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
         <div className="bg-white rounded-xl border border-gray-200 p-4 text-center">
           <p className="text-2xl font-bold text-blue-600">{stats.confirmation}</p>
           <p className="text-xs text-gray-500 mt-1">Confirmações</p>

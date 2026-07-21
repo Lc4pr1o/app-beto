@@ -57,7 +57,7 @@ export default async function DashboardPage() {
     : null;
 
   return (
-    <div className="p-6 max-w-5xl mx-auto">
+    <div className="p-3 sm:p-6 max-w-5xl mx-auto">
       <div className="flex items-center justify-between mb-6">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">Dashboard</h2>
@@ -78,7 +78,7 @@ export default async function DashboardPage() {
             <DollarSign className="text-green-600" size={20} />
             <span className="text-xs text-gray-500">Receita do mês</span>
           </div>
-          <p className="text-xl font-bold text-gray-900">
+          <p className="text-base sm:text-xl font-bold text-gray-900">
             R$ {monthRevenue.toFixed(2).replace(".", ",")}
           </p>
           {goalPct !== null ? (
@@ -120,9 +120,9 @@ export default async function DashboardPage() {
           ) : (
             <ul className="space-y-3">
               {todayAppointments.map((appt) => (
-                <li key={appt.id} className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium text-gray-800 text-sm">
+                <li key={appt.id} className="flex items-center justify-between gap-2">
+                  <div className="min-w-0">
+                    <p className="font-medium text-gray-800 text-sm truncate">
                       {appt.client?.name ?? appt.title}
                     </p>
                     <p className="text-gray-400 text-xs">
@@ -146,9 +146,9 @@ export default async function DashboardPage() {
           ) : (
             <ul className="space-y-3">
               {pendingPayments.map((p) => (
-                <li key={p.id} className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium text-gray-800 text-sm">
+                <li key={p.id} className="flex items-center justify-between gap-2">
+                  <div className="min-w-0">
+                    <p className="font-medium text-gray-800 text-sm truncate">
                       {p.client?.name ?? <span className="text-gray-400 italic">Cliente excluído</span>}
                     </p>
                     <p className="text-gray-400 text-xs">

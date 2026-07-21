@@ -14,11 +14,12 @@ export function RevenueChart({
   const totalWidth = data.length * (BAR_WIDTH + GAP) - GAP;
 
   return (
-    <div className="overflow-x-auto">
+    <div>
       <svg
-        width={totalWidth}
+        viewBox={`0 0 ${totalWidth} ${HEIGHT + 28}`}
+        width="100%"
         height={HEIGHT + 28}
-        style={{ display: "block", minWidth: totalWidth }}
+        style={{ display: "block" }}
       >
         {data.map((d, i) => {
           const x = i * (BAR_WIDTH + GAP);

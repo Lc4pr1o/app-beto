@@ -58,7 +58,7 @@ export default async function FinanceiroPage() {
   const pendingCount = pendingGroups.reduce((sum, s) => sum + s._count, 0);
 
   return (
-    <div className="p-6 max-w-4xl mx-auto">
+    <div className="p-3 sm:p-6 max-w-4xl mx-auto">
       <div className="mb-6 flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">Financeiro</h2>
@@ -72,7 +72,7 @@ export default async function FinanceiroPage() {
             className="flex items-center gap-2 border border-gray-200 text-gray-600 px-3 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors"
           >
             <Download size={14} />
-            Exportar CSV
+            <span className="hidden sm:inline">Exportar CSV</span>
           </Link>
           <NewChargeModal clients={clients} />
         </div>
@@ -84,7 +84,7 @@ export default async function FinanceiroPage() {
             <CheckCircle size={16} className="text-green-600" />
             <span className="text-xs text-gray-500">Recebido no mês</span>
           </div>
-          <p className="text-xl font-bold text-gray-900">
+          <p className="text-base sm:text-xl font-bold text-gray-900">
             R$ {totalPaid.toFixed(2).replace(".", ",")}
           </p>
           <p className="text-xs text-gray-400">{paid?._count ?? 0} pagamentos</p>
@@ -95,7 +95,7 @@ export default async function FinanceiroPage() {
             <Clock size={16} className="text-amber-500" />
             <span className="text-xs text-gray-500">A receber</span>
           </div>
-          <p className="text-xl font-bold text-gray-900">
+          <p className="text-base sm:text-xl font-bold text-gray-900">
             R$ {totalPending.toFixed(2).replace(".", ",")}
           </p>
           <p className="text-xs text-gray-400">{pendingCount} pendentes</p>
@@ -106,7 +106,7 @@ export default async function FinanceiroPage() {
             <TrendingUp size={16} className="text-violet-600" />
             <span className="text-xs text-gray-500">Total previsto</span>
           </div>
-          <p className="text-xl font-bold text-gray-900">
+          <p className="text-base sm:text-xl font-bold text-gray-900">
             R$ {(totalPaid + totalPending).toFixed(2).replace(".", ",")}
           </p>
           <p className="text-xs text-gray-400">recebido + pendente</p>
@@ -136,9 +136,9 @@ export default async function FinanceiroPage() {
         ) : (
           <div className="divide-y divide-gray-50">
             {payments.map((p) => (
-              <div key={p.id} className="flex items-center justify-between px-4 py-3">
-                <div>
-                  <p className="text-sm font-medium text-gray-800">
+              <div key={p.id} className="flex items-center justify-between px-4 py-3 gap-3">
+                <div className="min-w-0">
+                  <p className="text-sm font-medium text-gray-800 truncate">
                     {p.client?.name ?? <span className="text-gray-400 italic">Cliente excluído</span>}
                   </p>
                   <p className="text-xs text-gray-400">

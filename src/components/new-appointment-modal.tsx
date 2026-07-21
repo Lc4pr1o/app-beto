@@ -173,7 +173,7 @@ export function NewAppointmentModal({ clients: initialClients }: { clients: Clie
         className="flex items-center gap-2 bg-violet-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-violet-700 transition-colors"
       >
         <Plus size={16} />
-        Novo Agendamento
+        <span className="hidden sm:inline">Novo Agendamento</span>
       </button>
     );
   }
@@ -367,7 +367,7 @@ export function NewAppointmentModal({ clients: initialClients }: { clients: Clie
               </span>
             </label>
             {createPayment && (
-              <div className="mt-3 flex items-center gap-2">
+              <div className="mt-3 flex items-center gap-2 flex-wrap">
                 <span className="text-sm text-gray-500">R$</span>
                 <input
                   type="number"
@@ -375,7 +375,7 @@ export function NewAppointmentModal({ clients: initialClients }: { clients: Clie
                   step="0.01"
                   value={paymentAmount}
                   onChange={(e) => setPaymentAmount(e.target.value)}
-                  className="w-32 border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-300 bg-white"
+                  className="w-28 border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-300 bg-white"
                 />
                 <span className="text-xs text-gray-400">Valor da sessão</span>
               </div>
@@ -394,7 +394,7 @@ export function NewAppointmentModal({ clients: initialClients }: { clients: Clie
               <span className="text-sm font-medium text-gray-700">Repetir semanalmente</span>
             </label>
             {repeatWeeks > 0 && (
-              <div className="mt-3 flex items-center gap-2">
+              <div className="mt-3 flex items-center gap-2 flex-wrap">
                 <span className="text-sm text-gray-500">Por</span>
                 <select
                   value={repeatWeeks}
