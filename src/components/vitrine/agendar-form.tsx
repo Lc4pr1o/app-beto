@@ -144,7 +144,7 @@ export function AgendarForm({
           >
             {services.map((s) => (
               <option key={s.id} value={s.id}>
-                {s.name} — {s.durationMins}min — R$ {s.price.toFixed(2).replace(".", ",")}
+                {s.name} — {s.durationMins}min — a partir de R$ {s.price.toFixed(2).replace(".", ",")}
               </option>
             ))}
           </select>

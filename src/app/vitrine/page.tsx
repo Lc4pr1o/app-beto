@@ -126,9 +126,12 @@ export default async function VitrinePage() {
 
       {/* Serviços */}
       <section id="servicos" className="max-w-3xl mx-auto px-6 py-16 scroll-mt-6">
-        <h2 className={`${playfair.className} text-2xl sm:text-3xl font-semibold text-center mb-10`}>
+        <h2 className={`${playfair.className} text-2xl sm:text-3xl font-semibold text-center mb-3`}>
           Serviços
         </h2>
+        <p className="text-center text-xs text-[#8a6a4b] mb-10">
+          Sessões de 50 minutos. Valores podem variar em datas especiais ou fora do horário comercial.
+        </p>
         {services.length === 0 ? (
           <p className="text-center text-[#5c4a3a]">
             Fale pelo WhatsApp para conhecer os serviços disponíveis.
@@ -145,9 +148,12 @@ export default async function VitrinePage() {
                   <p className="text-xs text-[#8a6a4b]">{service.durationMins} minutos</p>
                 </div>
                 <div className="flex items-center gap-3 shrink-0">
-                  <span className="font-semibold text-[#3d2e22]">
-                    R$ {service.price.toFixed(2).replace(".", ",")}
-                  </span>
+                  <div className="text-right leading-tight">
+                    <p className="text-[10px] text-[#8a6a4b]">a partir de</p>
+                    <span className="font-semibold text-[#3d2e22]">
+                      R$ {service.price.toFixed(2).replace(".", ",")}
+                    </span>
+                  </div>
                   <Link
                     href={`/vitrine/agendar?servico=${service.id}`}
                     className="text-xs font-medium bg-[#8a6a4b] text-white px-3 py-2 rounded-full hover:bg-[#75563a] transition-colors"
