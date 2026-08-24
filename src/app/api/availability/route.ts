@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { businessHoursRangeBR } from "@/lib/date";
 
 const BUSINESS_START_H = 8;
 const BUSINESS_END_H = 18;
-const BR_OFFSET_MS = 3 * 60 * 60 * 1000;
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -14,12 +14,11 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Parâmetro date obrigatório (YYYY-MM-DD)" }, { status: 400 });
   }
 
-  const [year, month, day] = dateStr.split("-").map(Number);
-
-  // Midnight Brasil em UTC: UTC + 3h = meia-noite horário de Brasília
-  const midnightBrAsUTC = Date.UTC(year, month - 1, day, 0, 0, 0) + BR_OFFSET_MS;
-  const businessStart = new Date(midnightBrAsUTC + BUSINESS_START_H * 60 * 60 * 1000);
-  const businessEnd = new Date(midnightBrAsUTC + BUSINESS_END_H * 60 * 60 * 1000);
+  const { start: businessStart, end: businessEnd } = businessHoursRangeBR(
+    dateStr,
+    BUSINESS_START_H,
+    BUSINESS_END_H
+  );
 
   const existing = await prisma.appointment.findMany({
     where: {

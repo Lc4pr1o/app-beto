@@ -2,10 +2,12 @@ export const revalidate = 300;
 
 import type { Metadata } from "next";
 import Image from "next/image";
+import Link from "next/link";
 import { Playfair_Display } from "next/font/google";
 import {
   MessageCircle,
   MapPin,
+  CalendarCheck,
   HandHeart,
   Wind,
   Droplets,
@@ -14,21 +16,16 @@ import {
   Sparkles,
 } from "lucide-react";
 import { prisma } from "@/lib/prisma";
+import {
+  BETO_PHONE_DISPLAY,
+  INSTAGRAM_HANDLE,
+  INSTAGRAM_URL,
+  ADDRESS,
+  MAPS_URL,
+  whatsappLink,
+} from "@/lib/vitrine";
 
 const playfair = Playfair_Display({ subsets: ["latin"], weight: ["500", "600", "700"] });
-
-const WHATSAPP_NUMBER = "5516991358579";
-const WHATSAPP_DISPLAY = "(16) 99135-8579";
-const INSTAGRAM_HANDLE = "@spalhum";
-const INSTAGRAM_URL = "https://www.instagram.com/spalhum";
-const ADDRESS = "Rua Barão do Rio Branco, 964 – Serrana, SP";
-const MAPS_URL = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-  "Rua Barão do Rio Branco, 964, Serrana, SP"
-)}`;
-
-function whatsappLink(message: string) {
-  return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
-}
 
 export const metadata: Metadata = {
   title: "Humberto Bove — Massoterapeuta | Spaço Lhum",
@@ -75,22 +72,26 @@ export default async function VitrinePage() {
           <p className="text-white/90 text-sm sm:text-base mb-1">Massoterapeuta</p>
           <p className="text-lg sm:text-xl mb-8">&ldquo;Massoterapia que cuida de verdade&rdquo;</p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+            <Link
+              href="/vitrine/agendar"
+              className="inline-flex items-center justify-center gap-2 bg-white text-[#8a6a4b] font-medium px-5 py-3 rounded-full hover:bg-white/90 transition-colors w-full sm:w-auto"
+            >
+              <CalendarCheck size={18} />
+              Agendar horário online
+            </Link>
             <a
               href={whatsappLink("Olá Humberto, vim pelo site e quero agendar um horário.")}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 bg-white text-[#8a6a4b] font-medium px-5 py-3 rounded-full hover:bg-white/90 transition-colors w-full sm:w-auto"
-            >
-              <MessageCircle size={18} />
-              Agendar pelo WhatsApp
-            </a>
-            <a
-              href="#servicos"
               className="inline-flex items-center justify-center gap-2 border border-white/70 text-white font-medium px-5 py-3 rounded-full hover:bg-white/10 transition-colors w-full sm:w-auto"
             >
-              Ver serviços
+              <MessageCircle size={18} />
+              Falar no WhatsApp
             </a>
           </div>
+          <a href="#servicos" className="inline-block mt-5 text-sm text-white/70 hover:text-white underline underline-offset-4">
+            Ver serviços
+          </a>
         </div>
       </header>
 
@@ -147,16 +148,12 @@ export default async function VitrinePage() {
                   <span className="font-semibold text-[#3d2e22]">
                     R$ {service.price.toFixed(2).replace(".", ",")}
                   </span>
-                  <a
-                    href={whatsappLink(
-                      `Olá Humberto, vim pelo site e quero agendar: ${service.name}.`
-                    )}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <Link
+                    href={`/vitrine/agendar?servico=${service.id}`}
                     className="text-xs font-medium bg-[#8a6a4b] text-white px-3 py-2 rounded-full hover:bg-[#75563a] transition-colors"
                   >
                     Agendar
-                  </a>
+                  </Link>
                 </div>
               </li>
             ))}
@@ -196,6 +193,13 @@ export default async function VitrinePage() {
         <h2 className={`${playfair.className} text-2xl sm:text-3xl font-semibold mb-6`}>
           Agende seu horário
         </h2>
+        <Link
+          href="/vitrine/agendar"
+          className="inline-flex items-center justify-center gap-2 bg-[#8a6a4b] text-white font-medium px-6 py-3 rounded-full hover:bg-[#75563a] transition-colors mb-8"
+        >
+          <CalendarCheck size={18} />
+          Agendar horário online
+        </Link>
         <div className="flex flex-col items-center gap-3 text-[#5c4a3a] mb-8">
           <a
             href={whatsappLink("Olá Humberto, vim pelo site e quero agendar um horário.")}
@@ -204,7 +208,7 @@ export default async function VitrinePage() {
             className="inline-flex items-center gap-2 text-base font-medium text-[#3d2e22] hover:text-[#8a6a4b] transition-colors"
           >
             <MessageCircle size={18} />
-            {WHATSAPP_DISPLAY}
+            {BETO_PHONE_DISPLAY}
           </a>
           <a
             href={MAPS_URL}

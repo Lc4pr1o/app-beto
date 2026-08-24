@@ -47,3 +47,17 @@ export function formatDateBR(date: Date): string {
     timeZone: "America/Sao_Paulo",
   });
 }
+
+/** Início/fim de um intervalo de horário comercial (horário de Brasília) para uma data "YYYY-MM-DD". */
+export function businessHoursRangeBR(
+  dateStr: string,
+  startHour: number,
+  endHour: number
+): { start: Date; end: Date } {
+  const [year, month, day] = dateStr.split("-").map(Number);
+  const midnightBrAsUTC = Date.UTC(year, month - 1, day, 0, 0, 0) + BR_OFFSET_MS;
+  return {
+    start: new Date(midnightBrAsUTC + startHour * 60 * 60 * 1000),
+    end: new Date(midnightBrAsUTC + endHour * 60 * 60 * 1000),
+  };
+}
