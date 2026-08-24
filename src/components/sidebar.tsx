@@ -17,7 +17,7 @@ export function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
 
-  if (pathname === "/login") return null;
+  if (pathname === "/login" || pathname.startsWith("/vitrine")) return null;
 
   async function handleLogout() {
     await fetch("/api/auth/logout", { method: "POST" });

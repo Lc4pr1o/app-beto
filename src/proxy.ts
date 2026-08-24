@@ -3,6 +3,7 @@ import { SESSION_COOKIE, computeSessionToken } from "@/lib/auth";
 
 const PUBLIC_PATHS = [
   "/login",
+  "/vitrine",
   "/api/auth/login",
   "/api/payments/webhook",
   "/api/cron/confirmations",
