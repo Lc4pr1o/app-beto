@@ -17,8 +17,8 @@ import { prisma } from "@/lib/prisma";
 
 const playfair = Playfair_Display({ subsets: ["latin"], weight: ["500", "600", "700"] });
 
-const WHATSAPP_NUMBER = "5516981147925";
-const WHATSAPP_DISPLAY = "(16) 98114-7925";
+const WHATSAPP_NUMBER = "5516991358579";
+const WHATSAPP_DISPLAY = "(16) 99135-8579";
 const INSTAGRAM_HANDLE = "@spalhum";
 const INSTAGRAM_URL = "https://www.instagram.com/spalhum";
 const ADDRESS = "Rua Barão do Rio Branco, 964 – Serrana, SP";
