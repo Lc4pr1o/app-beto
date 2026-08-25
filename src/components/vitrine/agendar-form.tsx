@@ -171,7 +171,9 @@ export function AgendarForm({
             onChange={(e) => setDate(e.target.value)}
             className="w-full border border-[#8a6a4b]/25 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#8a6a4b]/40 bg-white"
           />
-          <p className="text-xs text-[#8a6a4b] mt-1.5">Atendimento de segunda a sexta, das 7h às 19h.</p>
+          <p className="text-xs text-[#8a6a4b] mt-1.5">
+            Horários online de segunda a sexta, das 7h às 19h. Fins de semana são combinados direto.
+          </p>
         </div>
 
         {date && (
@@ -182,7 +184,7 @@ export function AgendarForm({
             </label>
             {isWeekend ? (
               <p className="text-sm text-[#5c4a3a]">
-                Não atendemos aos fins de semana.{" "}
+                Fins de semana são combinados diretamente.{" "}
                 <a
                   href={whatsappLink(fallbackMessage())}
                   target="_blank"
@@ -191,7 +193,7 @@ export function AgendarForm({
                 >
                   Fale no WhatsApp
                 </a>{" "}
-                pra combinar outro dia.
+                pra ver a disponibilidade.
               </p>
             ) : loadingSlots ? (
               <p className="text-sm text-[#8a6a4b]">Carregando...</p>
