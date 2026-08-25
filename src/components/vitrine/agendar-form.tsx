@@ -122,8 +122,12 @@ export function AgendarForm({
         <p className="text-[#5c4a3a] text-sm mb-1">
           {confirmed.serviceName} — {confirmed.dateLabel}
         </p>
-        <p className="text-[#5c4a3a] text-sm mb-6">
+        <p className="text-[#5c4a3a] text-sm mb-4">
           Você vai receber a confirmação pelo WhatsApp. Qualquer coisa, é só chamar.
+        </p>
+        <p className="text-xs text-[#8a6a4b] bg-[#8a6a4b]/10 rounded-lg px-3 py-2 mb-6">
+          Precisa remarcar ou cancelar? Avise com pelo menos 4h de antecedência — com menos que isso é
+          cobrado 50% do valor da sessão.
         </p>
         <a
           href={whatsappLink("Olá Humberto, acabei de reservar um horário pelo site!")}
