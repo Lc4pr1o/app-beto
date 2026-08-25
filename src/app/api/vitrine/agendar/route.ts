@@ -105,8 +105,8 @@ export async function POST(req: NextRequest) {
   try {
     const googleEventId = await createCalendarEvent({ title, startTime: start, endTime: end });
     await prisma.appointment.update({ where: { id: appointment.id }, data: { googleEventId } });
-  } catch {
-    // best-effort
+  } catch (err) {
+    console.error("[vitrine/agendar] falha ao criar evento no Google Calendar:", err);
   }
 
   const dataHora = `${formatDateBR(start)} às ${formatTimeBR(start)}`;
@@ -122,8 +122,8 @@ export async function POST(req: NextRequest) {
         (notes ? `\nObs: ${notes}` : "") +
         `\n\nJá está na sua agenda. Confirme com o cliente se precisar ajustar algo.`
     );
-  } catch {
-    // best-effort
+  } catch (err) {
+    console.error("[vitrine/agendar] falha ao avisar o Beto pelo WhatsApp:", err);
   }
 
   try {
@@ -133,8 +133,8 @@ export async function POST(req: NextRequest) {
         `Seu horário de *${service.name}* foi reservado para *${dataHora}* no Spaço Lhum.\n\n` +
         `Qualquer imprevisto, é só chamar por aqui. Até lá! 💆`
     );
-  } catch {
-    // best-effort
+  } catch (err) {
+    console.error("[vitrine/agendar] falha ao confirmar pro cliente pelo WhatsApp:", err);
   }
 
   return NextResponse.json(
