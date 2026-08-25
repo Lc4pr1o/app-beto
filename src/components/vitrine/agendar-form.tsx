@@ -37,7 +37,11 @@ export function AgendarForm({
 
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
-  const [confirmed, setConfirmed] = useState<{ dateLabel: string; serviceName: string } | null>(null);
+  const [confirmed, setConfirmed] = useState<{
+    dateLabel: string;
+    serviceName: string;
+    isFirstSession: boolean;
+  } | null>(null);
 
   const service = services.find((s) => s.id === serviceId);
   const today = useMemo(() => todayBR(), []);
@@ -106,6 +110,7 @@ export function AgendarForm({
           timeZone: "America/Sao_Paulo",
         }),
         serviceName: data.serviceName,
+        isFirstSession: Boolean(data.isFirstSession),
       });
     } catch {
       setError("Não foi possível enviar sua reserva. Tente novamente.");
@@ -122,13 +127,26 @@ export function AgendarForm({
         <p className="text-[#5c4a3a] text-sm mb-1">
           {confirmed.serviceName} — {confirmed.dateLabel}
         </p>
-        <p className="text-[#5c4a3a] text-sm mb-4">
+        <p className="text-[#5c4a3a] text-sm mb-6">
           Você vai receber a confirmação pelo WhatsApp. Qualquer coisa, é só chamar.
         </p>
-        <p className="text-xs text-[#8a6a4b] bg-[#8a6a4b]/10 rounded-lg px-3 py-2 mb-6">
-          Precisa remarcar ou cancelar? Avise com pelo menos 4h de antecedência — com menos que isso é
-          cobrado 50% do valor da sessão.
-        </p>
+
+        {confirmed.isFirstSession && (
+          <div className="text-left bg-[#8a6a4b]/10 rounded-lg px-4 py-3 mb-6 space-y-2.5">
+            <p className="text-xs font-semibold text-[#3d2e22]">Primeira vez aqui? Alguns avisos:</p>
+            <ul className="text-xs text-[#5c4a3a] list-disc pl-4 space-y-1">
+              <li>Venha com roupas leves e confortáveis</li>
+              <li>Evite refeições pesadas pouco antes da sessão</li>
+              <li>Chegue com alguns minutos de antecedência</li>
+              <li>Beba bastante água depois da sessão</li>
+            </ul>
+            <p className="text-xs text-[#5c4a3a] pt-2 border-t border-[#8a6a4b]/20">
+              Precisa remarcar ou cancelar? Avise com pelo menos <strong>4h de antecedência</strong> — com
+              menos que isso é cobrado <strong>50% do valor da sessão</strong>.
+            </p>
+          </div>
+        )}
+
         <a
           href={whatsappLink("Olá Humberto, acabei de reservar um horário pelo site!")}
           target="_blank"

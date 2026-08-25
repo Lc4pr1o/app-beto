@@ -83,6 +83,10 @@ export async function POST(req: NextRequest) {
     update: {},
     create: { name, phone },
   });
+  const priorAppointments = await prisma.appointment.count({
+    where: { clientId: client.id, status: { not: "CANCELLED" } },
+  });
+  const isFirstSession = priorAppointments === 0;
 
   const title = `${client.name} - ${service.name}`;
   const noteText = ["Agendado pelo site", notes].filter(Boolean).join(" — ");
@@ -127,8 +131,6 @@ export async function POST(req: NextRequest) {
       client.phone,
       `Olá ${client.name.split(" ")[0]}! 👋\n\n` +
         `Seu horário de *${service.name}* foi reservado para *${dataHora}* no Spaço Lhum.\n\n` +
-        `Precisa remarcar ou cancelar? Sem problemas, só avisar com pelo menos *4h de antecedência*. ` +
-        `Com menos de 4h, é cobrado *50% do valor da sessão*.\n\n` +
         `Qualquer imprevisto, é só chamar por aqui. Até lá! 💆`
     );
   } catch {
@@ -141,6 +143,7 @@ export async function POST(req: NextRequest) {
       startTime: appointment.startTime,
       endTime: appointment.endTime,
       serviceName: service.name,
+      isFirstSession,
     },
     { status: 201 }
   );
