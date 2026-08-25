@@ -4,7 +4,14 @@ import { prisma } from "@/lib/prisma";
 import { createCalendarEvent } from "@/lib/google-calendar";
 import { sendText } from "@/lib/evolution";
 import { formatDateBR, formatTimeBR, businessHoursRangeBR } from "@/lib/date";
-import { BETO_PHONE, BUSINESS_START_H, BUSINESS_END_H, MIN_LEAD_MINUTES } from "@/lib/vitrine";
+import {
+  BETO_PHONE,
+  BUSINESS_START_H,
+  BUSINESS_END_H,
+  SESSION_SLOT_MINUTES,
+  MIN_LEAD_MINUTES,
+  isBusinessDay,
+} from "@/lib/vitrine";
 
 const bookingSchema = z.object({
   name: z.string().trim().min(2),
@@ -36,7 +43,7 @@ export async function POST(req: NextRequest) {
   }
 
   const start = new Date(startTime);
-  const end = new Date(start.getTime() + service.durationMins * 60 * 1000);
+  const end = new Date(start.getTime() + SESSION_SLOT_MINUTES * 60 * 1000);
   const dateStr = start.toLocaleDateString("sv-SE", { timeZone: "America/Sao_Paulo" });
   const { start: businessStart, end: businessEnd } = businessHoursRangeBR(
     dateStr,
@@ -44,8 +51,17 @@ export async function POST(req: NextRequest) {
     BUSINESS_END_H
   );
   const earliestStart = new Date(Date.now() + MIN_LEAD_MINUTES * 60 * 1000);
+  const startMinutesBR = Number(
+    start.toLocaleTimeString("pt-BR", { minute: "2-digit", timeZone: "America/Sao_Paulo" })
+  );
 
-  if (start < businessStart || end > businessEnd || start < earliestStart) {
+  if (
+    !isBusinessDay(dateStr) ||
+    start < businessStart ||
+    end > businessEnd ||
+    start < earliestStart ||
+    startMinutesBR !== 0
+  ) {
     return NextResponse.json(
       { error: "Esse horário não está mais disponível. Escolha outro." },
       { status: 400 }

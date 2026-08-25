@@ -130,7 +130,7 @@ export default async function VitrinePage() {
           Serviços
         </h2>
         <p className="text-center text-xs text-[#8a6a4b] mb-10">
-          Sessões de 50 minutos. Valores podem variar em datas especiais ou fora do horário comercial.
+          Atendimento com hora marcada. Valores podem variar em datas especiais ou fora do horário comercial.
         </p>
         {services.length === 0 ? (
           <p className="text-center text-[#5c4a3a]">

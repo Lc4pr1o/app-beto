@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { Playfair_Display } from "next/font/google";
 import { CalendarCheck, Clock, MessageCircle, CheckCircle2 } from "lucide-react";
-import { whatsappLink } from "@/lib/vitrine";
+import { whatsappLink, isBusinessDay } from "@/lib/vitrine";
 
 const playfair = Playfair_Display({ subsets: ["latin"], weight: ["500", "600", "700"] });
 
@@ -41,17 +41,29 @@ export function AgendarForm({
 
   const service = services.find((s) => s.id === serviceId);
   const today = useMemo(() => todayBR(), []);
+  const isWeekend = date.length > 0 && !isBusinessDay(date);
 
   useEffect(() => {
-    if (!date || !service) return;
+    if (!date || !service || isWeekend) {
+      setSlots([]);
+      return;
+    }
     setLoadingSlots(true);
     setSelectedSlot(null);
     setError("");
-    fetch(`/api/vitrine/availability?date=${date}&duration=${service.durationMins}`)
+    fetch(`/api/vitrine/availability?date=${date}`)
       .then((r) => r.json())
       .then(setSlots)
       .finally(() => setLoadingSlots(false));
-  }, [date, service]);
+  }, [date, service, isWeekend]);
+
+  function fallbackMessage() {
+    const dateLabel = date
+      ? new Date(`${date}T12:00:00`).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" })
+      : "";
+    const servicePart = service ? ` (${service.name})` : "";
+    return `Olá Humberto, vim pelo site e queria marcar um horário no dia ${dateLabel}${servicePart}, mas não achei horário disponível online. Pode me ajudar?`;
+  }
 
   async function handleSubmit() {
     if (!service || !selectedSlot || !name.trim() || !phone.trim()) return;
@@ -76,7 +88,7 @@ export function AgendarForm({
       if (!res.ok) {
         setError(typeof data.error === "string" ? data.error : "Não foi possível reservar esse horário.");
         if (res.status === 409 && date) {
-          fetch(`/api/vitrine/availability?date=${date}&duration=${service.durationMins}`)
+          fetch(`/api/vitrine/availability?date=${date}`)
             .then((r) => r.json())
             .then(setSlots);
           setSelectedSlot(null);
@@ -159,6 +171,7 @@ export function AgendarForm({
             onChange={(e) => setDate(e.target.value)}
             className="w-full border border-[#8a6a4b]/25 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#8a6a4b]/40 bg-white"
           />
+          <p className="text-xs text-[#8a6a4b] mt-1.5">Atendimento de segunda a sexta, das 7h às 19h.</p>
         </div>
 
         {date && (
@@ -167,13 +180,26 @@ export function AgendarForm({
               <Clock size={13} className="inline mr-1" />
               Horários disponíveis
             </label>
-            {loadingSlots ? (
+            {isWeekend ? (
+              <p className="text-sm text-[#5c4a3a]">
+                Não atendemos aos fins de semana.{" "}
+                <a
+                  href={whatsappLink(fallbackMessage())}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline underline-offset-2 font-medium"
+                >
+                  Fale no WhatsApp
+                </a>{" "}
+                pra combinar outro dia.
+              </p>
+            ) : loadingSlots ? (
               <p className="text-sm text-[#8a6a4b]">Carregando...</p>
             ) : slots.length === 0 ? (
               <p className="text-sm text-[#5c4a3a]">
                 Nenhum horário disponível nessa data.{" "}
                 <a
-                  href={whatsappLink("Olá Humberto, vim pelo site e quero agendar um horário.")}
+                  href={whatsappLink(fallbackMessage())}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="underline underline-offset-2 font-medium"
