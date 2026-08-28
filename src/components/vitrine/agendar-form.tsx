@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from "react";
 import { CalendarDays, Clock, MessageCircle, BadgeCheck, Phone } from "lucide-react";
 import { whatsappLink, isBusinessDay } from "@/lib/vitrine";
 import { Card } from "@/components/vitrine/ds/Card";
-import { Select } from "@/components/vitrine/ds/Select";
+import { ServiceCard } from "@/components/vitrine/ds/ServiceCard";
 import { Input } from "@/components/vitrine/ds/Input";
 import { Textarea } from "@/components/vitrine/ds/Textarea";
 import { TimeSlot } from "@/components/vitrine/ds/TimeSlot";
@@ -175,15 +175,23 @@ export function AgendarForm({
         <p style={{ font: "var(--type-caption)", color: "var(--text-muted)" }}>Spaço Lhum · Humberto Bove Massoterapia</p>
       </div>
 
-      <Card padding="var(--space-24)" className="flex flex-col gap-5">
-        <Select label="Serviço" value={serviceId} onChange={(e) => setServiceId(e.target.value)}>
+      <div className="flex flex-col gap-2">
+        <span className="ds-eyebrow">Serviço</span>
+        <div className="grid grid-cols-2 gap-2">
           {services.map((s) => (
-            <option key={s.id} value={s.id}>
-              {s.name} — {s.durationMins}min — a partir de R$ {s.price.toFixed(2).replace(".", ",")}
-            </option>
+            <ServiceCard
+              key={s.id}
+              name={s.name}
+              duration={`${s.durationMins} min`}
+              price={`a partir de R$ ${s.price.toFixed(2).replace(".", ",")}`}
+              selected={s.id === serviceId}
+              onSelect={() => setServiceId(s.id)}
+            />
           ))}
-        </Select>
+        </div>
+      </div>
 
+      <Card padding="var(--space-24)" className="flex flex-col gap-5">
         <Input
           type="date"
           label="Data"

@@ -8,6 +8,7 @@ export function ServiceCard({
   description,
   badge,
   onSelect,
+  selected = false,
 }: {
   name: string;
   duration?: string;
@@ -15,9 +16,21 @@ export function ServiceCard({
   description?: string;
   badge?: string;
   onSelect?: () => void;
+  selected?: boolean;
 }) {
   return (
-    <Card interactive={!!onSelect} padding="0" onClick={onSelect} style={{ overflow: "hidden", display: "flex", flexDirection: "column", height: "100%" }}>
+    <Card
+      interactive={!!onSelect}
+      padding="0"
+      onClick={onSelect}
+      style={{
+        overflow: "hidden",
+        display: "flex",
+        flexDirection: "column",
+        height: "100%",
+        boxShadow: selected ? "0 0 0 1.5px var(--action-primary), var(--shadow-lifted)" : undefined,
+      }}
+    >
       <div style={{ padding: "var(--space-20)", display: "flex", flexDirection: "column", gap: "var(--space-8)", flex: 1 }}>
         <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: "var(--space-12)" }}>
           <h4 style={{ font: "var(--type-heading)", fontFamily: "var(--font-serif-display)", fontWeight: "var(--weight-regular)", fontSize: "var(--size-heading-m)", color: "var(--text-strong)", margin: 0 }}>
