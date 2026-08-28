@@ -28,9 +28,8 @@ import {
   whatsappLink,
 } from "@/lib/vitrine";
 import { Button } from "@/components/vitrine/ds/Button";
-import { Card } from "@/components/vitrine/ds/Card";
 import { SectionHeading } from "@/components/vitrine/ds/SectionHeading";
-import { PriceRow } from "@/components/vitrine/ds/PriceRow";
+import { ServiceCard } from "@/components/vitrine/ds/ServiceCard";
 import { Icon } from "@/components/vitrine/ds/Icon";
 
 export const metadata: Metadata = {
@@ -63,16 +62,20 @@ async function getServices() {
   });
 }
 
-function Wordmark({ tone = "default" }: { tone?: "default" | "inverse" }) {
+function Wordmark({ tone = "default", size = 22 }: { tone?: "default" | "inverse"; size?: number }) {
   const color = tone === "inverse" ? "var(--linen-0)" : "var(--text-strong)";
-  const sub = tone === "inverse" ? "rgba(255,253,251,.62)" : "var(--text-muted)";
+  const sub = tone === "inverse" ? "rgba(255,253,251,.7)" : "var(--text-muted)";
+  const rule = tone === "inverse" ? "rgba(255,253,251,.55)" : "var(--action-primary)";
   return (
-    <span style={{ display: "flex", flexDirection: "column", gap: 2 }}>
-      <span style={{ fontFamily: "var(--font-serif-display)", fontWeight: 300, fontSize: 22, lineHeight: 1, letterSpacing: "-.02em", color }}>
+    <span style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 5 }}>
+      <span style={{ fontFamily: "var(--font-serif-display)", fontWeight: 300, fontStyle: "italic", fontSize: size, lineHeight: 1, letterSpacing: "-.02em", color }}>
         Humberto Bove
       </span>
-      <span style={{ font: "var(--type-eyebrow)", letterSpacing: "var(--tracking-caps)", textTransform: "uppercase", color: sub }}>
-        Spaço Lhum
+      <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
+        <span style={{ width: size * 1.6, height: 1, background: rule, flex: "none" }} />
+        <span style={{ font: "var(--type-eyebrow)", letterSpacing: "var(--tracking-caps)", textTransform: "uppercase", color: sub }}>
+          Spaço Lhum
+        </span>
       </span>
     </span>
   );
@@ -173,12 +176,12 @@ export default async function VitrinePage() {
         </div>
       </section>
 
-      {/* Serviços / valores */}
+      {/* Serviços */}
       <section id="servicos" style={{ background: "var(--surface-sage-soft)" }}>
         <div className="max-w-[var(--container-max)] mx-auto px-[var(--gutter-inline)] lg:px-[var(--gutter-inline-lg)] py-14 lg:py-[var(--section-y)] flex flex-col gap-10">
           <SectionHeading
             eyebrow="Serviços"
-            title="Valores"
+            title="O que trabalhamos na sessão"
             description="Sessões de 1 hora, sempre em horário cheio. Valores podem variar em datas especiais ou fora do horário comercial."
             action={
               <Button variant="secondary" href="/vitrine/agendar" style={{ marginTop: "var(--space-8)" }}>
@@ -186,28 +189,23 @@ export default async function VitrinePage() {
               </Button>
             }
           />
-          <Card padding="var(--space-32)">
-            {services.length === 0 ? (
-              <p style={{ font: "var(--type-body)", color: "var(--text-muted)" }}>
-                Fale pelo WhatsApp para conhecer os serviços disponíveis.
-              </p>
-            ) : (
-              services.map((service) => (
-                <Link
-                  key={service.id}
-                  href={`/vitrine/agendar?servico=${service.id}`}
-                  className="block -mx-2 px-2 rounded-[var(--radius-sm)] transition-colors"
-                  style={{ transition: "background-color var(--dur-fast) var(--ease-standard)" }}
-                >
-                  <PriceRow
+          {services.length === 0 ? (
+            <p style={{ font: "var(--type-body)", color: "var(--text-muted)" }}>
+              Fale pelo WhatsApp para conhecer os serviços disponíveis.
+            </p>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[var(--space-24)]">
+              {services.map((service) => (
+                <Link key={service.id} href={`/vitrine/agendar?servico=${service.id}`} className="block h-full">
+                  <ServiceCard
                     name={service.name}
-                    meta={`${service.durationMins} min · consultório`}
+                    duration={`${service.durationMins} min`}
                     price={`a partir de R$ ${service.price.toFixed(2).replace(".", ",")}`}
                   />
                 </Link>
-              ))
-            )}
-          </Card>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
