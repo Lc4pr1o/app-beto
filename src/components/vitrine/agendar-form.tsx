@@ -1,11 +1,15 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import { Playfair_Display } from "next/font/google";
-import { CalendarCheck, Clock, MessageCircle, CheckCircle2 } from "lucide-react";
+import { CalendarDays, Clock, MessageCircle, BadgeCheck, Phone } from "lucide-react";
 import { whatsappLink, isBusinessDay } from "@/lib/vitrine";
-
-const playfair = Playfair_Display({ subsets: ["latin"], weight: ["500", "600", "700"] });
+import { Card } from "@/components/vitrine/ds/Card";
+import { Select } from "@/components/vitrine/ds/Select";
+import { Input } from "@/components/vitrine/ds/Input";
+import { Textarea } from "@/components/vitrine/ds/Textarea";
+import { TimeSlot } from "@/components/vitrine/ds/TimeSlot";
+import { Button } from "@/components/vitrine/ds/Button";
+import { Icon } from "@/components/vitrine/ds/Icon";
 
 type Service = { id: string; name: string; durationMins: number; price: number };
 type Slot = { start: string; end: string };
@@ -102,9 +106,8 @@ export function AgendarForm({
 
       setConfirmed({
         dateLabel: new Date(data.startTime).toLocaleString("pt-BR", {
-          weekday: "long",
           day: "2-digit",
-          month: "long",
+          month: "short",
           hour: "2-digit",
           minute: "2-digit",
           timeZone: "America/Sao_Paulo",
@@ -121,113 +124,95 @@ export function AgendarForm({
 
   if (confirmed) {
     return (
-      <div className="max-w-md mx-auto text-center bg-white rounded-2xl border border-[#8a6a4b]/15 p-8">
-        <CheckCircle2 size={40} className="text-[#8a6a4b] mx-auto mb-4" />
-        <h1 className={`${playfair.className} text-2xl font-semibold mb-3`}>Pedido recebido!</h1>
-        <p className="text-[#5c4a3a] text-sm mb-1">
-          {confirmed.serviceName} — {confirmed.dateLabel}
-        </p>
-        <p className="text-[#5c4a3a] text-sm mb-6">
-          Você vai receber a confirmação pelo WhatsApp. Qualquer coisa, é só chamar.
-        </p>
+      <div className="flex flex-col items-center text-center gap-4">
+        <Icon icon={BadgeCheck} size={40} style={{ color: "var(--status-success)" }} />
+        <div className="flex flex-col gap-2">
+          <h1>Sessão confirmada</h1>
+          <p style={{ font: "var(--type-body)", color: "var(--text-body)" }}>
+            {confirmed.serviceName} · {confirmed.dateLabel}
+          </p>
+          <p style={{ font: "var(--type-caption)", color: "var(--text-muted)" }}>
+            A confirmação chega no WhatsApp. Qualquer coisa, é só chamar.
+          </p>
+        </div>
 
         {confirmed.isFirstSession && (
-          <div className="text-left bg-[#8a6a4b]/10 rounded-lg px-4 py-3 mb-6 space-y-2.5">
-            <p className="text-xs font-semibold text-[#3d2e22]">Primeira vez aqui? Alguns avisos:</p>
-            <ul className="text-xs text-[#5c4a3a] list-disc pl-4 space-y-1">
-              <li>Venha com roupas leves e confortáveis</li>
-              <li>Evite refeições pesadas pouco antes da sessão</li>
-              <li>Chegue com alguns minutos de antecedência</li>
-              <li>Beba bastante água depois da sessão</li>
-            </ul>
-            <p className="text-xs text-[#5c4a3a] pt-2 border-t border-[#8a6a4b]/20">
-              Precisa remarcar ou cancelar? Avise com pelo menos <strong>4h de antecedência</strong> — com
-              menos que isso é cobrado <strong>50% do valor da sessão</strong>.
+          <Card tone="soft" className="text-left w-full">
+            <p style={{ font: "var(--type-body)", fontSize: "var(--size-body-s)", fontWeight: "var(--weight-medium)", color: "var(--text-strong)", marginBottom: "var(--space-8)" }}>
+              Primeira sessão — alguns avisos
             </p>
-          </div>
+            <ul style={{ font: "var(--type-caption)", color: "var(--text-body)", paddingLeft: 18, display: "flex", flexDirection: "column", gap: "var(--space-6)" }}>
+              <li>Venha com roupas leves e confortáveis.</li>
+              <li>Evite refeições pesadas pouco antes da sessão.</li>
+              <li>Chegue com alguns minutos de antecedência.</li>
+              <li>Beba bastante água depois da sessão.</li>
+            </ul>
+            <p style={{ font: "var(--type-caption)", color: "var(--text-muted)", marginTop: "var(--space-12)", paddingTop: "var(--space-12)", borderTop: "1px solid var(--border-hairline)" }}>
+              Remarcações e cancelamentos com menos de 4 horas de antecedência têm cobrança de 50% do valor da
+              sessão.
+            </p>
+          </Card>
         )}
 
-        <a
+        <Button
+          variant="primary"
           href={whatsappLink("Olá Humberto, acabei de reservar um horário pelo site!")}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center justify-center gap-2 bg-[#8a6a4b] text-white font-medium px-5 py-3 rounded-full hover:bg-[#75563a] transition-colors"
+          iconLeft={<Icon icon={MessageCircle} size={18} />}
         >
-          <MessageCircle size={18} />
           Falar no WhatsApp
-        </a>
+        </Button>
       </div>
     );
   }
 
   return (
-    <div className="max-w-md mx-auto">
-      <div className="text-center mb-8">
-        <CalendarCheck size={28} className="text-[#8a6a4b] mx-auto mb-3" />
-        <h1 className={`${playfair.className} text-3xl font-semibold mb-2`}>Agendar horário</h1>
-        <p className="text-[#5c4a3a] text-sm">Spaço Lhum · Humberto Bove Massoterapeuta</p>
+    <div className="flex flex-col gap-8">
+      <div className="flex flex-col items-center text-center gap-3">
+        <Icon icon={CalendarDays} size={26} style={{ color: "var(--text-accent)" }} />
+        <h1>Agendar horário</h1>
+        <p style={{ font: "var(--type-caption)", color: "var(--text-muted)" }}>Spaço Lhum · Humberto Bove Massoterapia</p>
       </div>
 
-      <div className="bg-white rounded-2xl border border-[#8a6a4b]/15 p-6 space-y-5">
-        <div>
-          <label className="text-sm font-medium text-[#3d2e22] block mb-1.5">Serviço</label>
-          <select
-            value={serviceId}
-            onChange={(e) => setServiceId(e.target.value)}
-            className="w-full border border-[#8a6a4b]/25 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#8a6a4b]/40 bg-white"
-          >
-            {services.map((s) => (
-              <option key={s.id} value={s.id}>
-                {s.name} — {s.durationMins}min — a partir de R$ {s.price.toFixed(2).replace(".", ",")}
-              </option>
-            ))}
-          </select>
-        </div>
+      <Card padding="var(--space-24)" className="flex flex-col gap-5">
+        <Select label="Serviço" value={serviceId} onChange={(e) => setServiceId(e.target.value)}>
+          {services.map((s) => (
+            <option key={s.id} value={s.id}>
+              {s.name} — {s.durationMins}min — a partir de R$ {s.price.toFixed(2).replace(".", ",")}
+            </option>
+          ))}
+        </Select>
 
-        <div>
-          <label className="text-sm font-medium text-[#3d2e22] block mb-1.5">Data</label>
-          <input
-            type="date"
-            value={date}
-            min={today}
-            onChange={(e) => setDate(e.target.value)}
-            className="w-full border border-[#8a6a4b]/25 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#8a6a4b]/40 bg-white"
-          />
-          <p className="text-xs text-[#8a6a4b] mt-1.5">
-            Horários online de segunda a sexta, das 7h às 19h. Fins de semana são combinados direto.
-          </p>
-        </div>
+        <Input
+          type="date"
+          label="Data"
+          value={date}
+          min={today}
+          onChange={(e) => setDate(e.target.value)}
+          hint="Horários online de segunda a sexta, das 7h às 19h. Fins de semana são combinados direto."
+        />
 
         {date && (
-          <div>
-            <label className="text-sm font-medium text-[#3d2e22] block mb-2">
-              <Clock size={13} className="inline mr-1" />
+          <div className="flex flex-col gap-2">
+            <span className="ds-eyebrow flex items-center gap-1.5">
+              <Icon icon={Clock} size={13} />
               Horários disponíveis
-            </label>
+            </span>
             {isWeekend ? (
-              <p className="text-sm text-[#5c4a3a]">
+              <p style={{ font: "var(--type-caption)", color: "var(--text-body)" }}>
                 Fins de semana são combinados diretamente.{" "}
-                <a
-                  href={whatsappLink(fallbackMessage())}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="underline underline-offset-2 font-medium"
-                >
+                <a href={whatsappLink(fallbackMessage())} target="_blank" rel="noopener noreferrer">
                   Fale no WhatsApp
                 </a>{" "}
                 pra ver a disponibilidade.
               </p>
             ) : loadingSlots ? (
-              <p className="text-sm text-[#8a6a4b]">Carregando...</p>
+              <p style={{ font: "var(--type-caption)", color: "var(--text-muted)" }}>Carregando horários…</p>
             ) : slots.length === 0 ? (
-              <p className="text-sm text-[#5c4a3a]">
+              <p style={{ font: "var(--type-caption)", color: "var(--text-body)" }}>
                 Nenhum horário disponível nessa data.{" "}
-                <a
-                  href={whatsappLink(fallbackMessage())}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="underline underline-offset-2 font-medium"
-                >
+                <a href={whatsappLink(fallbackMessage())} target="_blank" rel="noopener noreferrer">
                   Fale no WhatsApp
                 </a>
                 .
@@ -240,20 +225,13 @@ export function AgendarForm({
                     minute: "2-digit",
                     timeZone: "America/Sao_Paulo",
                   });
-                  const isSelected = selectedSlot?.start === slot.start;
                   return (
-                    <button
+                    <TimeSlot
                       key={slot.start}
-                      type="button"
+                      time={time}
+                      state={selectedSlot?.start === slot.start ? "selected" : "available"}
                       onClick={() => setSelectedSlot(slot)}
-                      className={`text-sm py-2.5 rounded-lg font-medium border transition-colors ${
-                        isSelected
-                          ? "border-[#8a6a4b] bg-[#8a6a4b] text-white"
-                          : "border-[#8a6a4b]/25 text-[#3d2e22] hover:border-[#8a6a4b]"
-                      }`}
-                    >
-                      {time}
-                    </button>
+                    />
                   );
                 })}
               </div>
@@ -263,52 +241,44 @@ export function AgendarForm({
 
         {selectedSlot && (
           <>
-            <div>
-              <label className="text-sm font-medium text-[#3d2e22] block mb-1.5">Seu nome</label>
-              <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Nome completo"
-                className="w-full border border-[#8a6a4b]/25 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#8a6a4b]/40 bg-white"
-              />
-            </div>
-            <div>
-              <label className="text-sm font-medium text-[#3d2e22] block mb-1.5">WhatsApp</label>
-              <input
-                type="tel"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="(16) 99999-9999"
-                className="w-full border border-[#8a6a4b]/25 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#8a6a4b]/40 bg-white"
-              />
-            </div>
-            <div>
-              <label className="text-sm font-medium text-[#3d2e22] block mb-1.5">
-                Observações <span className="text-[#8a6a4b]/70 font-normal">(opcional)</span>
-              </label>
-              <textarea
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                rows={2}
-                placeholder="Alguma preferência ou informação?"
-                className="w-full border border-[#8a6a4b]/25 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#8a6a4b]/40 bg-white resize-none"
-              />
-            </div>
+            <Input label="Seu nome" value={name} onChange={(e) => setName(e.target.value)} placeholder="Nome completo" />
+            <Input
+              type="tel"
+              label="WhatsApp"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="(16) 99999-9999"
+              iconLeft={<Icon icon={Phone} size={16} />}
+              hint="Só para confirmar o horário."
+            />
+            <Textarea
+              label="Observações (opcional)"
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              rows={2}
+              placeholder="Alguma preferência ou informação?"
+            />
           </>
         )}
 
-        {error && <p className="text-sm text-red-700 bg-red-50 px-3 py-2 rounded-lg">{error}</p>}
+        {error && (
+          <p
+            style={{
+              font: "var(--type-caption)",
+              color: "var(--status-danger)",
+              background: "var(--status-danger-soft)",
+              borderRadius: "var(--radius-control)",
+              padding: "var(--space-8) var(--space-12)",
+            }}
+          >
+            {error}
+          </p>
+        )}
 
-        <button
-          type="button"
-          onClick={handleSubmit}
-          disabled={!selectedSlot || !name.trim() || !phone.trim() || submitting}
-          className="w-full bg-[#8a6a4b] text-white py-3 rounded-full text-sm font-medium hover:bg-[#75563a] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-        >
-          {submitting ? "Enviando..." : "Confirmar reserva"}
-        </button>
-      </div>
+        <Button variant="primary" fullWidth disabled={!selectedSlot || !name.trim() || !phone.trim() || submitting} onClick={handleSubmit}>
+          {submitting ? "Enviando…" : selectedSlot ? "Confirmar reserva" : "Escolha um horário"}
+        </Button>
+      </Card>
     </div>
   );
 }

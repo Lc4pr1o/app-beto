@@ -1,13 +1,16 @@
+import "./bove-ds.css";
+
 export const revalidate = 300;
 
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { Playfair_Display } from "next/font/google";
 import {
+  CalendarDays,
   MessageCircle,
   MapPin,
-  CalendarCheck,
+  Clock,
+  AtSign,
   HandHeart,
   Wind,
   Droplets,
@@ -24,8 +27,11 @@ import {
   MAPS_URL,
   whatsappLink,
 } from "@/lib/vitrine";
-
-const playfair = Playfair_Display({ subsets: ["latin"], weight: ["500", "600", "700"] });
+import { Button } from "@/components/vitrine/ds/Button";
+import { Card } from "@/components/vitrine/ds/Card";
+import { SectionHeading } from "@/components/vitrine/ds/SectionHeading";
+import { PriceRow } from "@/components/vitrine/ds/PriceRow";
+import { Icon } from "@/components/vitrine/ds/Icon";
 
 export const metadata: Metadata = {
   title: "Humberto Bove — Massoterapeuta | Spaço Lhum",
@@ -42,10 +48,12 @@ const BENEFITS = [
   { icon: Moon, label: "Contribui para uma melhor qualidade do sono" },
 ];
 
-const GALLERY = [
-  { src: "/vitrine/massoterapia.jpg", alt: "Sessão de massoterapia no Spaço Lhum" },
-  { src: "/vitrine/sessao.jpg", alt: "Humberto Bove aplicando massoterapia" },
-  { src: "/vitrine/missao.jpg", alt: "Humberto Bove, massoterapeuta do Spaço Lhum" },
+const GALLERY_IMAGE = { src: "/vitrine/sessao.jpg", alt: "Humberto Bove aplicando massoterapia" };
+
+const NAV_LINKS = [
+  { href: "#servicos", label: "Serviços" },
+  { href: "#sobre", label: "Sobre" },
+  { href: "#contato", label: "Contato" },
 ];
 
 async function getServices() {
@@ -55,188 +63,201 @@ async function getServices() {
   });
 }
 
+function Wordmark({ tone = "default" }: { tone?: "default" | "inverse" }) {
+  const color = tone === "inverse" ? "var(--linen-0)" : "var(--text-strong)";
+  const sub = tone === "inverse" ? "rgba(255,253,251,.62)" : "var(--text-muted)";
+  return (
+    <span style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+      <span style={{ fontFamily: "var(--font-serif-display)", fontWeight: 300, fontSize: 22, lineHeight: 1, letterSpacing: "-.02em", color }}>
+        Humberto Bove
+      </span>
+      <span style={{ font: "var(--type-eyebrow)", letterSpacing: "var(--tracking-caps)", textTransform: "uppercase", color: sub }}>
+        Spaço Lhum
+      </span>
+    </span>
+  );
+}
+
 export default async function VitrinePage() {
   const services = await getServices();
 
   return (
-    <div className="min-h-screen bg-[#f7f1ea] text-[#3d2e22]">
-      {/* Hero */}
-      <header className="bg-gradient-to-b from-[#8a6a4b] to-[#6f5439]">
-        <div className="max-w-3xl mx-auto px-6 py-16 sm:py-24 text-center text-white">
-          <p className="uppercase tracking-[0.3em] text-xs sm:text-sm text-white/80 mb-3">
-            Spaço Lhum
-          </p>
-          <h1 className={`${playfair.className} text-4xl sm:text-5xl font-semibold mb-4`}>
-            Humberto Bove
-          </h1>
-          <p className="text-white/90 text-sm sm:text-base mb-1">Massoterapeuta</p>
-          <p className="text-lg sm:text-xl mb-8">&ldquo;Massoterapia que cuida de verdade&rdquo;</p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-            <Link
-              href="/vitrine/agendar"
-              className="inline-flex items-center justify-center gap-2 bg-white text-[#8a6a4b] font-medium px-5 py-3 rounded-full hover:bg-white/90 transition-colors w-full sm:w-auto"
-            >
-              <CalendarCheck size={18} />
-              Agendar horário online
-            </Link>
-            <a
-              href={whatsappLink("Olá Humberto, vim pelo site e quero agendar um horário.")}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 border border-white/70 text-white font-medium px-5 py-3 rounded-full hover:bg-white/10 transition-colors w-full sm:w-auto"
-            >
-              <MessageCircle size={18} />
-              Falar no WhatsApp
-            </a>
+    <div className="bove-ds" style={{ background: "var(--surface-page)", minHeight: "100vh" }}>
+      {/* Header */}
+      <header
+        className="sticky top-0 z-20 border-b"
+        style={{ background: "rgba(250,246,241,.86)", backdropFilter: "var(--overlay-blur)", borderColor: "var(--border-hairline)" }}
+      >
+        <div className="max-w-[var(--container-max)] mx-auto flex items-center gap-6 lg:gap-10 px-[var(--gutter-inline)] lg:px-[var(--gutter-inline-lg)] py-4">
+          <Wordmark />
+          <nav className="hidden md:flex gap-8 ml-auto">
+            {NAV_LINKS.map((l) => (
+              <a key={l.href} href={l.href} style={{ font: "var(--type-body)", fontSize: "var(--size-body-s)", color: "var(--text-body)" }} className="no-underline">
+                {l.label}
+              </a>
+            ))}
+          </nav>
+          <div className="ml-auto md:ml-0">
+            <Button variant="primary" size="sm" href="/vitrine/agendar" iconLeft={<Icon icon={CalendarDays} size={16} />}>
+              Agendar
+            </Button>
           </div>
-          <a href="#servicos" className="inline-block mt-5 text-sm text-white/70 hover:text-white underline underline-offset-4">
-            Ver serviços
-          </a>
         </div>
       </header>
 
-      {/* Missão */}
-      <section className="max-w-3xl mx-auto px-6 py-14 text-center">
-        <h2 className={`${playfair.className} text-2xl sm:text-3xl font-semibold mb-4`}>
-          Minha missão
-        </h2>
-        <p className="text-base sm:text-lg text-[#5c4a3a] leading-relaxed">
-          Levar autocuidado e alívio de dores físicas e emocionais através das minhas mãos.
-        </p>
+      {/* Hero */}
+      <section className="max-w-[var(--container-max)] mx-auto px-[var(--gutter-inline)] lg:px-[var(--gutter-inline-lg)] py-16 lg:py-[var(--section-y)] grid grid-cols-1 lg:grid-cols-[1.05fr_.95fr] gap-10 lg:gap-[var(--space-72)] items-center">
+        <div className="flex flex-col gap-6">
+          <span className="ds-eyebrow">Massoterapia em Serrana, SP</span>
+          <h1 style={{ fontSize: "clamp(36px, 6vw, 60px)", maxWidth: "16ch" }}>Massoterapia que cuida de verdade.</h1>
+          <p style={{ font: "var(--type-body-lead)", color: "var(--text-body)", maxWidth: "var(--measure-narrow)" }}>
+            Sessões de uma hora, sempre em horário cheio, conduzidas com atenção ao que o seu corpo precisa naquele
+            dia. Escolha o serviço e reserve o horário direto por aqui.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <Button variant="primary" size="lg" href="/vitrine/agendar" iconLeft={<Icon icon={CalendarDays} size={18} />}>
+              Agendar horário online
+            </Button>
+            <Button
+              variant="secondary"
+              size="lg"
+              href={whatsappLink("Olá Humberto, vim pelo site e quero agendar um horário.")}
+              target="_blank"
+              rel="noopener noreferrer"
+              iconLeft={<Icon icon={MessageCircle} size={18} />}
+            >
+              Falar no WhatsApp
+            </Button>
+          </div>
+          <div className="flex flex-col gap-2 pt-4 border-t" style={{ borderColor: "var(--border-hairline)" }}>
+            {(
+              [
+                { icon: MapPin, text: "Serrana, SP" },
+                { icon: Clock, text: "Segunda a sexta, 7h às 19h" },
+                { icon: AtSign, text: "spalhum" },
+              ] satisfies { icon: typeof MapPin; text: string }[]
+            ).map(({ icon, text }) => (
+              <span key={text} className="flex items-center gap-2" style={{ font: "var(--type-caption)", color: "var(--text-muted)" }}>
+                <Icon icon={icon} size={15} />
+                {text}
+              </span>
+            ))}
+          </div>
+        </div>
+        <div className="relative rounded-[var(--radius-image)] overflow-hidden aspect-[4/5] lg:aspect-auto lg:h-[520px]" style={{ boxShadow: "var(--shadow-inset-hairline)" }}>
+          <Image src="/vitrine/massoterapia.jpg" alt="Sessão de massoterapia no Spaço Lhum" fill className="object-cover" priority />
+        </div>
       </section>
 
-      {/* Benefícios */}
-      <section className="bg-white/60 py-14">
-        <div className="max-w-4xl mx-auto px-6">
-          <h2 className={`${playfair.className} text-2xl sm:text-3xl font-semibold text-center mb-10`}>
-            Benefícios da massoterapia
-          </h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-6">
-            {BENEFITS.map(({ icon: Icon, label }) => (
-              <div key={label} className="flex flex-col items-center text-center gap-3">
-                <div className="w-12 h-12 rounded-full bg-[#8a6a4b]/10 flex items-center justify-center text-[#8a6a4b]">
-                  <Icon size={22} />
-                </div>
-                <p className="text-sm text-[#5c4a3a]">{label}</p>
-              </div>
-            ))}
+      {/* Sobre / missão */}
+      <section id="sobre" style={{ background: "var(--surface-card)", borderTop: "1px solid var(--border-hairline)", borderBottom: "1px solid var(--border-hairline)" }}>
+        <div className="max-w-[var(--container-max)] mx-auto px-[var(--gutter-inline)] lg:px-[var(--gutter-inline-lg)] py-14 lg:py-[var(--section-y)] grid grid-cols-1 lg:grid-cols-[.9fr_1.1fr] gap-10 lg:gap-[var(--space-72)] items-center">
+          <div className="relative rounded-[var(--radius-image)] overflow-hidden aspect-[4/5] lg:aspect-auto lg:h-[440px] order-2 lg:order-1" style={{ boxShadow: "var(--shadow-inset-hairline)" }}>
+            <Image src="/vitrine/missao.jpg" alt="Humberto Bove, massoterapeuta do Spaço Lhum" fill className="object-cover" />
+          </div>
+          <div className="flex flex-col gap-6 order-1 lg:order-2">
+            <SectionHeading
+              eyebrow="Sobre"
+              title="Minha missão"
+              description="Levar autocuidado e alívio de dores físicas e emocionais através das minhas mãos."
+            />
+            <div className="grid grid-cols-2 gap-4">
+              {BENEFITS.map(({ icon, label }) => (
+                <span key={label} className="flex items-start gap-3" style={{ font: "var(--type-body)", fontSize: "var(--size-body-s)", color: "var(--text-body)" }}>
+                  <Icon icon={icon} size={18} style={{ color: "var(--text-accent)", marginTop: 2 }} />
+                  {label}
+                </span>
+              ))}
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Serviços */}
-      <section id="servicos" className="max-w-3xl mx-auto px-6 py-16 scroll-mt-6">
-        <h2 className={`${playfair.className} text-2xl sm:text-3xl font-semibold text-center mb-3`}>
-          Serviços
-        </h2>
-        <p className="text-center text-xs text-[#8a6a4b] mb-10">
-          Atendimento com hora marcada. Valores podem variar em datas especiais ou fora do horário comercial.
-        </p>
-        {services.length === 0 ? (
-          <p className="text-center text-[#5c4a3a]">
-            Fale pelo WhatsApp para conhecer os serviços disponíveis.
-          </p>
-        ) : (
-          <ul className="space-y-3">
-            {services.map((service) => (
-              <li
-                key={service.id}
-                className="flex items-center justify-between gap-4 bg-white rounded-2xl border border-[#8a6a4b]/15 px-5 py-4"
-              >
-                <div className="min-w-0">
-                  <p className="font-medium text-[#3d2e22]">{service.name}</p>
-                  <p className="text-xs text-[#8a6a4b]">{service.durationMins} minutos</p>
-                </div>
-                <div className="flex items-center gap-3 shrink-0">
-                  <div className="text-right leading-tight">
-                    <p className="text-[10px] text-[#8a6a4b]">a partir de</p>
-                    <span className="font-semibold text-[#3d2e22]">
-                      R$ {service.price.toFixed(2).replace(".", ",")}
-                    </span>
-                  </div>
-                  <Link
-                    href={`/vitrine/agendar?servico=${service.id}`}
-                    className="text-xs font-medium bg-[#8a6a4b] text-white px-3 py-2 rounded-full hover:bg-[#75563a] transition-colors"
-                  >
-                    Agendar
-                  </Link>
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
+      {/* Serviços / valores */}
+      <section id="servicos" style={{ background: "var(--surface-sage-soft)" }}>
+        <div className="max-w-[var(--container-max)] mx-auto px-[var(--gutter-inline)] lg:px-[var(--gutter-inline-lg)] py-14 lg:py-[var(--section-y)] flex flex-col gap-10">
+          <SectionHeading
+            eyebrow="Serviços"
+            title="Valores"
+            description="Sessões de 1 hora, sempre em horário cheio. Valores podem variar em datas especiais ou fora do horário comercial."
+            action={
+              <Button variant="secondary" href="/vitrine/agendar" style={{ marginTop: "var(--space-8)" }}>
+                Agendar sessão
+              </Button>
+            }
+          />
+          <Card padding="var(--space-32)">
+            {services.length === 0 ? (
+              <p style={{ font: "var(--type-body)", color: "var(--text-muted)" }}>
+                Fale pelo WhatsApp para conhecer os serviços disponíveis.
+              </p>
+            ) : (
+              services.map((service) => (
+                <Link
+                  key={service.id}
+                  href={`/vitrine/agendar?servico=${service.id}`}
+                  className="block -mx-2 px-2 rounded-[var(--radius-sm)] transition-colors"
+                  style={{ transition: "background-color var(--dur-fast) var(--ease-standard)" }}
+                >
+                  <PriceRow
+                    name={service.name}
+                    meta={`${service.durationMins} min · consultório`}
+                    price={`a partir de R$ ${service.price.toFixed(2).replace(".", ",")}`}
+                  />
+                </Link>
+              ))
+            )}
+          </Card>
+        </div>
       </section>
 
       {/* Galeria */}
-      <section className="bg-white/60 py-16">
-        <div className="max-w-4xl mx-auto px-6">
-          <h2 className={`${playfair.className} text-2xl sm:text-3xl font-semibold text-center mb-10`}>
-            Galeria
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-            {GALLERY.map((img) => (
-              <div key={img.src} className="relative aspect-[3/4] rounded-2xl overflow-hidden">
-                <Image src={img.src} alt={img.alt} fill className="object-cover" />
-              </div>
-            ))}
+      <section style={{ background: "var(--surface-page)" }}>
+        <div className="max-w-[var(--container-max)] mx-auto px-[var(--gutter-inline)] lg:px-[var(--gutter-inline-lg)] py-14 lg:py-[var(--section-y)] flex flex-col gap-10">
+          <SectionHeading eyebrow="Galeria" title="No dia a dia do consultório" align="center" />
+          <div className="relative aspect-[4/5] rounded-[var(--radius-image)] overflow-hidden max-w-[360px] mx-auto w-full" style={{ boxShadow: "var(--shadow-inset-hairline)" }}>
+            <Image src={GALLERY_IMAGE.src} alt={GALLERY_IMAGE.alt} fill className="object-cover" />
           </div>
-          <p className="text-center text-sm text-[#5c4a3a]">
+          <p style={{ font: "var(--type-caption)", color: "var(--text-muted)", textAlign: "center" }}>
             Mais fotos no Instagram{" "}
-            <a
-              href={INSTAGRAM_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="font-medium text-[#8a6a4b] underline underline-offset-2"
-            >
+            <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer">
               {INSTAGRAM_HANDLE}
             </a>
           </p>
         </div>
       </section>
 
-      {/* Contato / Localização */}
-      <footer className="max-w-3xl mx-auto px-6 py-16 text-center">
-        <h2 className={`${playfair.className} text-2xl sm:text-3xl font-semibold mb-6`}>
-          Agende seu horário
-        </h2>
-        <Link
-          href="/vitrine/agendar"
-          className="inline-flex items-center justify-center gap-2 bg-[#8a6a4b] text-white font-medium px-6 py-3 rounded-full hover:bg-[#75563a] transition-colors mb-8"
-        >
-          <CalendarCheck size={18} />
-          Agendar horário online
-        </Link>
-        <div className="flex flex-col items-center gap-3 text-[#5c4a3a] mb-8">
-          <a
-            href={whatsappLink("Olá Humberto, vim pelo site e quero agendar um horário.")}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 text-base font-medium text-[#3d2e22] hover:text-[#8a6a4b] transition-colors"
-          >
-            <MessageCircle size={18} />
-            {BETO_PHONE_DISPLAY}
-          </a>
-          <a
-            href={MAPS_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 text-sm hover:text-[#8a6a4b] transition-colors"
-          >
-            <MapPin size={16} />
-            {ADDRESS}
-          </a>
-          <a
-            href={INSTAGRAM_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-sm hover:text-[#8a6a4b] transition-colors"
-          >
-            {INSTAGRAM_HANDLE}
-          </a>
+      {/* Footer */}
+      <footer id="contato" style={{ background: "var(--surface-inverse)", color: "var(--text-inverse)" }}>
+        <div className="max-w-[var(--container-max)] mx-auto px-[var(--gutter-inline)] lg:px-[var(--gutter-inline-lg)] py-12 lg:py-[var(--section-y-compact)] grid grid-cols-1 sm:grid-cols-3 gap-8 lg:gap-[var(--space-40)]">
+          <Wordmark tone="inverse" />
+          <div className="flex flex-col gap-2" style={{ font: "var(--type-caption)", color: "rgba(255,253,251,.72)" }}>
+            <span style={{ color: "var(--linen-0)" }}>Consultório</span>
+            <span>{ADDRESS}</span>
+            <span>Segunda a sexta, 7h às 19h</span>
+          </div>
+          <div className="flex flex-col gap-2" style={{ font: "var(--type-caption)", color: "rgba(255,253,251,.72)" }}>
+            <span style={{ color: "var(--linen-0)" }}>Contato</span>
+            <a href={whatsappLink("Olá Humberto, vim pelo site e quero agendar um horário.")} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2" style={{ color: "inherit" }}>
+              <Icon icon={MessageCircle} size={14} />
+              {BETO_PHONE_DISPLAY}
+            </a>
+            <a href={MAPS_URL} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2" style={{ color: "inherit" }}>
+              <Icon icon={MapPin} size={14} />
+              Como chegar
+            </a>
+            <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2" style={{ color: "inherit" }}>
+              <Icon icon={AtSign} size={14} />
+              {INSTAGRAM_HANDLE}
+            </a>
+          </div>
         </div>
-        <p className="text-xs text-[#8a6a4b]/70">
-          Spaço Lhum · Humberto Bove Massoterapeuta
-        </p>
+        <div
+          className="max-w-[var(--container-max)] mx-auto px-[var(--gutter-inline)] lg:px-[var(--gutter-inline-lg)] py-5"
+          style={{ borderTop: "1px solid rgba(255,253,251,.12)", font: "var(--type-caption)", color: "rgba(255,253,251,.5)" }}
+        >
+          Spaço Lhum · Humberto Bove Massoterapia
+        </div>
       </footer>
     </div>
   );

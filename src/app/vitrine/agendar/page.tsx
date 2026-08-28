@@ -1,3 +1,5 @@
+import "../bove-ds.css";
+
 import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import { AgendarForm } from "@/components/vitrine/agendar-form";
@@ -22,8 +24,10 @@ export default async function AgendarPage({
   const [{ servico }, services] = await Promise.all([searchParams, getServices()]);
 
   return (
-    <div className="min-h-screen bg-[#f7f1ea] text-[#3d2e22] px-6 py-12 sm:py-16">
-      <AgendarForm services={services} initialServiceId={servico} />
+    <div className="bove-ds" style={{ background: "var(--surface-page)", minHeight: "100vh" }}>
+      <div className="max-w-[560px] mx-auto px-[var(--gutter-inline)] py-12 lg:py-[var(--section-y-compact)]">
+        <AgendarForm services={services} initialServiceId={servico} />
+      </div>
     </div>
   );
 }
