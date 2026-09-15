@@ -2,8 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 
-export async function GET() {
-  const services = await prisma.service.findMany({ orderBy: { name: "asc" } });
+export async function GET(req: NextRequest) {
+  const activeOnly = new URL(req.url).searchParams.get("all") !== "1";
+  const services = await prisma.service.findMany({
+    where: activeOnly ? { active: true } : undefined,
+    orderBy: { name: "asc" },
+  });
   return NextResponse.json(services);
 }
 
