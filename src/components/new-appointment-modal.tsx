@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { X, Plus, Clock, UserPlus, DollarSign } from "lucide-react";
+import { useSlots } from "@/hooks/use-slots";
 
 type Client = { id: string; name: string; phone: string };
 type Service = { id: string; name: string; durationMins: number; price: number };
@@ -38,8 +39,6 @@ export function NewAppointmentModal({ clients: initialClients }: { clients: Clie
 
   // Estado assíncrono
   const [services, setServices] = useState<Service[]>([]);
-  const [slots, setSlots] = useState<Slot[]>([]);
-  const [loadingSlots, setLoadingSlots] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -52,7 +51,7 @@ export function NewAppointmentModal({ clients: initialClients }: { clients: Clie
   // Carregar serviços ao abrir
   useEffect(() => {
     if (!open || services.length > 0) return;
-    fetch("/api/services")
+    fetch("/api/servicos")
       .then((r) => r.json())
       .then((data) => {
         setServices(data);
@@ -63,21 +62,18 @@ export function NewAppointmentModal({ clients: initialClients }: { clients: Clie
       });
   }, [open, services.length]);
 
-  // Atualizar preço sugerido ao trocar serviço
-  useEffect(() => {
-    if (selectedService) setPaymentAmount(String(selectedService.price));
-  }, [selectedService]);
+  function handleServiceChange(id: string) {
+    setServiceId(id);
+    setSelectedSlot(null);
+    const service = services.find((s) => s.id === id);
+    if (service) setPaymentAmount(String(service.price));
+  }
 
   // Carregar slots ao mudar data ou serviço
-  useEffect(() => {
-    if (!date || !selectedService) return;
-    setLoadingSlots(true);
-    setSelectedSlot(null);
-    fetch(`/api/availability?date=${date}&duration=${selectedService.durationMins}`)
-      .then((r) => r.json())
-      .then(setSlots)
-      .finally(() => setLoadingSlots(false));
-  }, [date, selectedService]);
+  const slotsUrl =
+    date && selectedService ? `/api/availability?date=${date}&duration=${selectedService.durationMins}` : null;
+  const { data: fetchedSlots, loading: loadingSlots } = useSlots<Slot[]>(slotsUrl);
+  const slots = slotsUrl ? fetchedSlots ?? [] : [];
 
   function resetForm() {
     setClientSearch("");
@@ -85,7 +81,6 @@ export function NewAppointmentModal({ clients: initialClients }: { clients: Clie
     setDate("");
     setSelectedSlot(null);
     setNotes("");
-    setSlots([]);
     setError("");
     setShowNewClient(false);
     setNewClientPhone("");
@@ -227,7 +222,7 @@ export function NewAppointmentModal({ clients: initialClients }: { clients: Clie
                       className="px-3 py-2 text-sm cursor-pointer hover:bg-green-50 flex items-center gap-2 border-t border-gray-100 text-green-700"
                     >
                       <UserPlus size={14} />
-                      Criar cliente "{clientSearch.trim()}"
+                      Criar cliente &quot;{clientSearch.trim()}&quot;
                     </li>
                   )}
                 </ul>
@@ -272,7 +267,7 @@ export function NewAppointmentModal({ clients: initialClients }: { clients: Clie
             <label className="text-sm font-medium text-gray-700 block mb-1.5">Serviço</label>
             <select
               value={serviceId}
-              onChange={(e) => setServiceId(e.target.value)}
+              onChange={(e) => handleServiceChange(e.target.value)}
               className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-300"
             >
               {services.map((s) => (
@@ -290,7 +285,7 @@ export function NewAppointmentModal({ clients: initialClients }: { clients: Clie
               type="date"
               value={date}
               min={today}
-              onChange={(e) => setDate(e.target.value)}
+              onChange={(e) => { setDate(e.target.value); setSelectedSlot(null); }}
               className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-300"
             />
           </div>

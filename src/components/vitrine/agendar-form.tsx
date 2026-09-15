@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { CalendarDays, Clock, MessageCircle, BadgeCheck, Phone } from "lucide-react";
 import { whatsappLink, isBusinessDay } from "@/lib/vitrine";
+import { useSlots } from "@/hooks/use-slots";
 import { Card } from "@/components/vitrine/ds/Card";
 import { ServiceCard } from "@/components/vitrine/ds/ServiceCard";
 import { Input } from "@/components/vitrine/ds/Input";
@@ -31,8 +32,6 @@ export function AgendarForm({
       : services[0]?.id ?? ""
   );
   const [date, setDate] = useState("");
-  const [slots, setSlots] = useState<Slot[]>([]);
-  const [loadingSlots, setLoadingSlots] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState<Slot | null>(null);
 
   const [name, setName] = useState("");
@@ -51,19 +50,21 @@ export function AgendarForm({
   const today = useMemo(() => todayBR(), []);
   const isWeekend = date.length > 0 && !isBusinessDay(date);
 
-  useEffect(() => {
-    if (!date || !service || isWeekend) {
-      setSlots([]);
-      return;
-    }
-    setLoadingSlots(true);
+  const slotsUrl = date && service && !isWeekend ? `/api/vitrine/availability?date=${date}` : null;
+  const { data: fetchedSlots, loading: loadingSlots, refetch: refetchSlots } = useSlots<Slot[]>(slotsUrl);
+  const slots = slotsUrl ? fetchedSlots ?? [] : [];
+
+  function handleDateChange(value: string) {
+    setDate(value);
     setSelectedSlot(null);
     setError("");
-    fetch(`/api/vitrine/availability?date=${date}`)
-      .then((r) => r.json())
-      .then(setSlots)
-      .finally(() => setLoadingSlots(false));
-  }, [date, service, isWeekend]);
+  }
+
+  function handleServiceChange(id: string) {
+    setServiceId(id);
+    setSelectedSlot(null);
+    setError("");
+  }
 
   function fallbackMessage() {
     const dateLabel = date
@@ -96,9 +97,7 @@ export function AgendarForm({
       if (!res.ok) {
         setError(typeof data.error === "string" ? data.error : "Não foi possível reservar esse horário.");
         if (res.status === 409 && date) {
-          fetch(`/api/vitrine/availability?date=${date}`)
-            .then((r) => r.json())
-            .then(setSlots);
+          refetchSlots();
           setSelectedSlot(null);
         }
         return;
@@ -185,7 +184,7 @@ export function AgendarForm({
               duration={`${s.durationMins} min`}
               price={`a partir de R$ ${s.price.toFixed(2).replace(".", ",")}`}
               selected={s.id === serviceId}
-              onSelect={() => setServiceId(s.id)}
+              onSelect={() => handleServiceChange(s.id)}
             />
           ))}
         </div>
@@ -197,7 +196,7 @@ export function AgendarForm({
           label="Data"
           value={date}
           min={today}
-          onChange={(e) => setDate(e.target.value)}
+          onChange={(e) => handleDateChange(e.target.value)}
           hint="Horários online de segunda a sexta, das 7h às 19h. Fins de semana são combinados direto."
         />
 
