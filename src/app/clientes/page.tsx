@@ -31,8 +31,6 @@ export default async function ClientesPage({
     orderBy: { name: "asc" },
   });
 
-  const totalClients = q ? undefined : clients.length;
-
   return (
     <div className="p-3 sm:p-6 max-w-5xl mx-auto">
       <div className="mb-6">
@@ -72,7 +70,7 @@ export default async function ClientesPage({
           <Users size={40} className="text-gray-300 mx-auto mb-3" />
           {q ? (
             <>
-              <p className="text-gray-600 font-medium">Nenhum cliente encontrado para "{q}".</p>
+              <p className="text-gray-600 font-medium">Nenhum cliente encontrado para &quot;{q}&quot;.</p>
               <p className="text-gray-400 text-sm mt-1">Tente outro nome ou telefone.</p>
             </>
           ) : (

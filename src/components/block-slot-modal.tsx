@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { BanIcon, X, Trash2 } from "lucide-react";
 import { format } from "date-fns";
-import { ptBR } from "date-fns/locale";
 
 type BlockedSlot = { id: string; startTime: string; endTime: string; reason?: string | null };
 

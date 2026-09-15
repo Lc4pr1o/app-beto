@@ -1,7 +1,6 @@
 export const dynamic = "force-dynamic";
 
 import { prisma } from "@/lib/prisma";
-import { format } from "date-fns";
 import { Calendar, DollarSign, Users, Clock, AlertCircle } from "lucide-react";
 import { SyncButton } from "@/components/sync-button";
 import { PaymentButton } from "@/components/payment-button";

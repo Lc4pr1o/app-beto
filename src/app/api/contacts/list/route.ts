@@ -1,10 +1,10 @@
 export const maxDuration = 30;
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { google } from "googleapis";
 
-export async function GET(_req: NextRequest) {
+export async function GET() {
   const cookieStore = await cookies();
   const accessToken = cookieStore.get("gcal_contact_token")?.value;
 

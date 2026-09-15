@@ -18,7 +18,6 @@ export default async function FinanceiroPage() {
   );
 
   // Last 6 months for the chart
-  const sixMonthsAgo = startOfMonth(subMonths(today, 5));
   const chartMonths = Array.from({ length: 6 }, (_, i) => {
     const d = subMonths(today, 5 - i);
     return {

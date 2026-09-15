@@ -64,7 +64,7 @@ export default async function ClientePage({ params }: { params: Promise<{ id: st
             </p>
           )}
           <div className="mt-2">
-            <ClientTags clientId={client.id} initialTags={(client as any).tags ?? []} />
+            <ClientTags clientId={client.id} initialTags={client.tags ?? []} />
           </div>
         </div>
         <div className="flex items-center gap-2 w-full sm:w-auto">

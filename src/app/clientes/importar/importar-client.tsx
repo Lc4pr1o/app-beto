@@ -215,7 +215,7 @@ export function ImportarClient() {
         <button
           onClick={() => {
             const all: Record<number, string> = {};
-            filtered.forEach((c, i) => {
+            filtered.forEach((c) => {
               const realIndex = contacts.indexOf(c);
               all[realIndex] = c.phones[0];
             });

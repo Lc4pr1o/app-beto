@@ -82,7 +82,7 @@ export async function PATCH(
   if (noShow === "true" && existing.client) {
     try {
       const settings = await getSettings();
-      const msg = buildNoShowMessage(existing.client.name, (settings as any).noShowTemplate ?? null);
+      const msg = buildNoShowMessage(existing.client.name, settings.noShowTemplate ?? null);
       await sendText(existing.client.phone, msg);
       await prisma.whatsappLog.create({
         data: { clientId: existing.client.id, type: "NO_SHOW", message: msg, status: "sent" },

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Tag, X, Plus } from "lucide-react";
+import { X, Plus } from "lucide-react";
 
 const PRESET_TAGS = ["VIP", "Novo", "Inativo", "Pacote", "Indicação"];
 

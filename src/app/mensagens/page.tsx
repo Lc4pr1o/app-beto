@@ -3,7 +3,7 @@ export const dynamic = "force-dynamic";
 import { prisma } from "@/lib/prisma";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { MessageSquare, CheckCircle, Clock, RefreshCw } from "lucide-react";
+import { MessageSquare } from "lucide-react";
 import { getSettings } from "@/lib/settings";
 import { MessageSettingsForm } from "@/components/message-settings-form";
 import { MessageTriggerButtons } from "@/components/message-trigger-buttons";
