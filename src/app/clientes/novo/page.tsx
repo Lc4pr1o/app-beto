@@ -4,6 +4,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, UserPlus } from "lucide-react";
+import { Button } from "@/components/button";
+import { Input, Textarea } from "@/components/input";
 
 export default function NovoClientePage() {
   const router = useRouter();
@@ -78,29 +80,14 @@ export default function NovoClientePage() {
             <label className="text-sm font-medium text-gray-700 block mb-1.5">
               Nome completo <span className="text-red-400">*</span>
             </label>
-            <input
-              type="text"
-              required
-              autoFocus
-              value={form.name}
-              onChange={set("name")}
-              placeholder="Ex: Maria Silva"
-              className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-300"
-            />
+            <Input type="text" required autoFocus value={form.name} onChange={set("name")} placeholder="Ex: Maria Silva" />
           </div>
 
           <div>
             <label className="text-sm font-medium text-gray-700 block mb-1.5">
               WhatsApp <span className="text-red-400">*</span>
             </label>
-            <input
-              type="tel"
-              required
-              value={form.phone}
-              onChange={set("phone")}
-              placeholder="11999999999"
-              className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-300"
-            />
+            <Input type="tel" required value={form.phone} onChange={set("phone")} placeholder="11999999999" />
             <p className="text-xs text-gray-400 mt-1">Somente números, com DDD. Ex: 11999999999</p>
           </div>
 
@@ -108,25 +95,18 @@ export default function NovoClientePage() {
             <label className="text-sm font-medium text-gray-700 block mb-1.5">
               Email <span className="text-gray-400 font-normal">(opcional)</span>
             </label>
-            <input
-              type="email"
-              value={form.email}
-              onChange={set("email")}
-              placeholder="maria@email.com"
-              className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-300"
-            />
+            <Input type="email" value={form.email} onChange={set("email")} placeholder="maria@email.com" />
           </div>
 
           <div>
             <label className="text-sm font-medium text-gray-700 block mb-1.5">
               Observações <span className="text-gray-400 font-normal">(opcional)</span>
             </label>
-            <textarea
+            <Textarea
               value={form.notes}
               onChange={set("notes")}
               placeholder="Preferências, histórico de saúde, alergias, etc."
               rows={3}
-              className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-300 resize-none"
             />
           </div>
 
@@ -141,13 +121,9 @@ export default function NovoClientePage() {
             >
               Cancelar
             </Link>
-            <button
-              type="submit"
-              disabled={loading}
-              className="flex-1 bg-violet-600 text-white py-2.5 rounded-lg text-sm font-medium hover:bg-violet-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
+            <Button type="submit" disabled={loading} className="flex-1 py-2.5">
               {loading ? "Salvando..." : "Cadastrar Cliente"}
-            </button>
+            </Button>
           </div>
         </form>
       </div>

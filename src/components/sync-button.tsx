@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { RefreshCw } from "lucide-react";
+import { Button } from "@/components/button";
 
 export function SyncButton() {
   const [loading, setLoading] = useState(false);
@@ -25,14 +26,10 @@ export function SyncButton() {
   return (
     <div className="flex items-center gap-3">
       {result && <span className="text-sm text-gray-600">{result}</span>}
-      <button
-        onClick={handleSync}
-        disabled={loading}
-        className="flex items-center gap-2 px-4 py-2 bg-violet-600 hover:bg-violet-700 disabled:opacity-50 text-white text-sm font-medium rounded-lg transition-colors"
-      >
+      <Button onClick={handleSync} disabled={loading} className="flex items-center gap-2">
         <RefreshCw size={14} className={loading ? "animate-spin" : ""} />
         Sincronizar agenda
-      </button>
+      </Button>
     </div>
   );
 }

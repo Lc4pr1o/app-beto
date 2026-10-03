@@ -4,6 +4,7 @@ import { useState, useMemo } from "react";
 import { CalendarDays, Clock, MessageCircle, BadgeCheck, Phone } from "lucide-react";
 import { whatsappLink, isBusinessDay } from "@/lib/vitrine";
 import { useSlots } from "@/hooks/use-slots";
+import { formatCurrencyBR } from "@/lib/format";
 import { Card } from "@/components/vitrine/ds/Card";
 import { ServiceCard } from "@/components/vitrine/ds/ServiceCard";
 import { Input } from "@/components/vitrine/ds/Input";
@@ -182,7 +183,7 @@ export function AgendarForm({
               key={s.id}
               name={s.name}
               duration={`${s.durationMins} min`}
-              price={`a partir de R$ ${s.price.toFixed(2).replace(".", ",")}`}
+              price={`a partir de ${formatCurrencyBR(s.price)}`}
               selected={s.id === serviceId}
               onSelect={() => handleServiceChange(s.id)}
             />

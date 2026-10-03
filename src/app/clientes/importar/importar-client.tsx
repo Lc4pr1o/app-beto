@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Globe, Check, Phone, Search } from "lucide-react";
+import { Button } from "@/components/button";
+import { PageHeader } from "@/components/page-header";
 
 type Contact = {
   name: string;
@@ -104,12 +106,9 @@ export function ImportarClient() {
             {result.skipped} ignorado{result.skipped !== 1 ? "s" : ""} (telefone já cadastrado)
           </p>
         )}
-        <button
-          onClick={() => router.push("/clientes")}
-          className="bg-violet-600 text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-violet-700"
-        >
+        <Button onClick={() => router.push("/clientes")} className="px-6 py-2.5">
           Ver Clientes
-        </button>
+        </Button>
       </div>
     );
   }
@@ -182,21 +181,18 @@ export function ImportarClient() {
         Voltar
       </Link>
 
-      <div className="flex items-center justify-between mb-4">
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900">Importar Contatos</h2>
-          <p className="text-gray-500 text-sm">{contacts.length} contatos encontrados com telefone</p>
-        </div>
-        {selectedCount > 0 && (
-          <button
-            onClick={handleImport}
-            disabled={importing}
-            className="bg-violet-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-violet-700 disabled:opacity-50"
-          >
-            {importing ? "Importando..." : `Importar ${selectedCount} selecionado${selectedCount !== 1 ? "s" : ""}`}
-          </button>
-        )}
-      </div>
+      <PageHeader
+        title="Importar Contatos"
+        subtitle={`${contacts.length} contatos encontrados com telefone`}
+        className="mb-4"
+        action={
+          selectedCount > 0 && (
+            <Button onClick={handleImport} disabled={importing}>
+              {importing ? "Importando..." : `Importar ${selectedCount} selecionado${selectedCount !== 1 ? "s" : ""}`}
+            </Button>
+          )
+        }
+      />
 
       {/* Busca */}
       <div className="relative mb-4">
@@ -293,13 +289,9 @@ export function ImportarClient() {
 
       {selectedCount > 0 && (
         <div className="mt-4 flex justify-end">
-          <button
-            onClick={handleImport}
-            disabled={importing}
-            className="bg-violet-600 text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-violet-700 disabled:opacity-50"
-          >
+          <Button onClick={handleImport} disabled={importing} className="px-6 py-2.5">
             {importing ? "Importando..." : `Importar ${selectedCount} contato${selectedCount !== 1 ? "s" : ""}`}
-          </button>
+          </Button>
         </div>
       )}
     </div>

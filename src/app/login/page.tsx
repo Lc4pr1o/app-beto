@@ -3,6 +3,8 @@
 import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Lock } from "lucide-react";
+import { Button } from "@/components/button";
+import { Input } from "@/components/input";
 
 function LoginForm() {
   const router = useRouter();
@@ -48,26 +50,21 @@ function LoginForm() {
         <p className="text-gray-500 text-sm text-center mb-6">Digite a senha para continuar</p>
 
         <form onSubmit={handleSubmit} className="space-y-3">
-          <input
+          <Input
             type="password"
             autoFocus
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Senha"
-            className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-300"
           />
 
           {error && (
             <p className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded-lg">{error}</p>
           )}
 
-          <button
-            type="submit"
-            disabled={loading || !password}
-            className="w-full bg-violet-600 text-white py-2.5 rounded-lg text-sm font-medium hover:bg-violet-700 disabled:opacity-50 transition-colors"
-          >
+          <Button type="submit" disabled={loading || !password} className="w-full py-2.5">
             {loading ? "Entrando..." : "Entrar"}
-          </button>
+          </Button>
         </form>
       </div>
     </div>

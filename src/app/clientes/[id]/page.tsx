@@ -13,6 +13,10 @@ import { PaymentRowActions } from "@/components/payment-row-actions";
 import { SendWhatsappModal } from "@/components/send-whatsapp-modal";
 import { ClientTags } from "@/components/client-tags";
 import { formatTimeBR, formatDateBR } from "@/lib/date";
+import { formatCurrencyBR } from "@/lib/format";
+import { StatusBadge } from "@/components/status-badge";
+import { EmptyState } from "@/components/empty-state";
+import { APPOINTMENT_STATUS, PAYMENT_STATUS, MESSAGE_TYPE } from "@/lib/status-labels";
 
 export default async function ClientePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -100,7 +104,7 @@ export default async function ClientePage({ params }: { params: Promise<{ id: st
             Atendimentos
           </h3>
           {client.appointments.length === 0 ? (
-            <p className="text-gray-400 text-sm">Nenhum atendimento ainda.</p>
+            <EmptyState title="Nenhum atendimento ainda." />
           ) : (
             <ul className="space-y-2">
               {client.appointments.slice(0, 8).map((appt) => (
@@ -111,7 +115,7 @@ export default async function ClientePage({ params }: { params: Promise<{ id: st
                     </span>
                     <p className="text-xs text-gray-400">{appt.serviceType}</p>
                   </div>
-                  <StatusBadge status={appt.status} />
+                  <StatusBadge status={appt.status} map={APPOINTMENT_STATUS} />
                 </li>
               ))}
             </ul>
@@ -125,21 +129,19 @@ export default async function ClientePage({ params }: { params: Promise<{ id: st
             Pagamentos
           </h3>
           {client.payments.length === 0 ? (
-            <p className="text-gray-400 text-sm">Nenhum pagamento ainda.</p>
+            <EmptyState title="Nenhum pagamento ainda." />
           ) : (
             <ul className="space-y-2">
               {client.payments.slice(0, 8).map((p) => (
                 <li key={p.id} className="flex justify-between items-center text-sm">
                   <div>
-                    <span className="text-gray-700">
-                      R$ {p.amount.toFixed(2).replace(".", ",")}
-                    </span>
+                    <span className="text-gray-700">{formatCurrencyBR(p.amount)}</span>
                     <span className="text-gray-400 text-xs ml-2">
                       {format(p.createdAt, "dd/MM/yyyy", { locale: ptBR })}
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <PaymentStatusBadge status={p.status} />
+                    <StatusBadge status={p.status} map={PAYMENT_STATUS} />
                     <PaymentRowActions paymentId={p.id} status={p.status} />
                   </div>
                 </li>
@@ -164,13 +166,13 @@ export default async function ClientePage({ params }: { params: Promise<{ id: st
             Mensagens WhatsApp
           </h3>
           {client.whatsappLogs.length === 0 ? (
-            <p className="text-gray-400 text-sm">Nenhuma mensagem enviada ainda.</p>
+            <EmptyState title="Nenhuma mensagem enviada ainda." />
           ) : (
             <ul className="space-y-3">
               {client.whatsappLogs.map((log) => (
                 <li key={log.id} className="text-sm border-l-2 border-green-200 pl-3">
                   <div className="flex items-center gap-2 mb-1">
-                    <MessageTypeBadge type={log.type} />
+                    <StatusBadge status={log.type} map={MESSAGE_TYPE} />
                     <span className="text-gray-400 text-xs">
                       {format(log.sentAt, "dd/MM/yyyy HH:mm", { locale: ptBR })}
                     </span>
@@ -184,36 +186,4 @@ export default async function ClientePage({ params }: { params: Promise<{ id: st
       </div>
     </div>
   );
-}
-
-function StatusBadge({ status }: { status: string }) {
-  const map: Record<string, { label: string; className: string }> = {
-    SCHEDULED: { label: "Agendado", className: "bg-blue-100 text-blue-700" },
-    CONFIRMED: { label: "Confirmado", className: "bg-green-100 text-green-700" },
-    DONE: { label: "Concluído", className: "bg-gray-100 text-gray-600" },
-    CANCELLED: { label: "Cancelado", className: "bg-red-100 text-red-600" },
-  };
-  const s = map[status] ?? { label: status, className: "bg-gray-100 text-gray-600" };
-  return <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${s.className}`}>{s.label}</span>;
-}
-
-function PaymentStatusBadge({ status }: { status: string }) {
-  const map: Record<string, { label: string; className: string }> = {
-    PENDING: { label: "Pendente", className: "bg-amber-100 text-amber-700" },
-    SENT: { label: "Enviado", className: "bg-blue-100 text-blue-700" },
-    PAID: { label: "Pago", className: "bg-green-100 text-green-700" },
-    OVERDUE: { label: "Vencido", className: "bg-red-100 text-red-600" },
-  };
-  const s = map[status] ?? { label: status, className: "bg-gray-100 text-gray-600" };
-  return <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${s.className}`}>{s.label}</span>;
-}
-
-function MessageTypeBadge({ type }: { type: string }) {
-  const map: Record<string, { label: string; className: string }> = {
-    CONFIRMATION: { label: "Confirmação", className: "bg-blue-100 text-blue-700" },
-    PAYMENT_LINK: { label: "Pagamento", className: "bg-amber-100 text-amber-700" },
-    REENGAGEMENT: { label: "Reengajamento", className: "bg-purple-100 text-purple-700" },
-  };
-  const s = map[type] ?? { label: type, className: "bg-gray-100 text-gray-600" };
-  return <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${s.className}`}>{s.label}</span>;
 }

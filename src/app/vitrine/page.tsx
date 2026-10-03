@@ -19,6 +19,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { prisma } from "@/lib/prisma";
+import { formatCurrencyBR } from "@/lib/format";
 import {
   BETO_PHONE_DISPLAY,
   INSTAGRAM_HANDLE,
@@ -200,7 +201,7 @@ export default async function VitrinePage() {
                   <ServiceCard
                     name={service.name}
                     duration={`${service.durationMins} min`}
-                    price={`a partir de R$ ${service.price.toFixed(2).replace(".", ",")}`}
+                    price={`a partir de ${formatCurrencyBR(service.price)}`}
                   />
                 </Link>
               ))}

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Send } from "lucide-react";
+import { formatCurrencyBR } from "@/lib/format";
 
 export function PaymentButton({
   appointmentId,
@@ -18,7 +19,7 @@ export function PaymentButton({
   const [sent, setSent] = useState(false);
 
   async function handleSend() {
-    if (!confirm(`Enviar link de pagamento de R$ ${amount.toFixed(2).replace(".", ",")} para ${clientName}?`)) return;
+    if (!confirm(`Enviar link de pagamento de ${formatCurrencyBR(amount)} para ${clientName}?`)) return;
     setLoading(true);
     try {
       const res = await fetch("/api/payments/send", {

@@ -8,6 +8,11 @@ import { nowBR } from "@/lib/date";
 import { NewChargeModal } from "@/components/new-charge-modal";
 import { PaymentRowActions } from "@/components/payment-row-actions";
 import { RevenueChart } from "@/components/revenue-chart";
+import { PageHeader } from "@/components/page-header";
+import { StatusBadge } from "@/components/status-badge";
+import { PAYMENT_STATUS } from "@/lib/status-labels";
+import { EmptyState } from "@/components/empty-state";
+import { formatCurrencyBR } from "@/lib/format";
 import Link from "next/link";
 
 export default async function FinanceiroPage() {
@@ -58,24 +63,22 @@ export default async function FinanceiroPage() {
 
   return (
     <div className="p-3 sm:p-6 max-w-4xl mx-auto">
-      <div className="mb-6 flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900">Financeiro</h2>
-          <p className="text-gray-500 text-sm capitalize">
-            {format(today, "MMMM yyyy", { locale: ptBR })}
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Link
-            href="/api/financeiro/export"
-            className="flex items-center gap-2 border border-gray-200 text-gray-600 px-3 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors"
-          >
-            <Download size={14} />
-            <span className="hidden sm:inline">Exportar CSV</span>
-          </Link>
-          <NewChargeModal clients={clients} />
-        </div>
-      </div>
+      <PageHeader
+        title="Financeiro"
+        subtitle={<span className="capitalize">{format(today, "MMMM yyyy", { locale: ptBR })}</span>}
+        action={
+          <div className="flex items-center gap-2">
+            <Link
+              href="/api/financeiro/export"
+              className="flex items-center gap-2 border border-gray-200 text-gray-600 px-3 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors"
+            >
+              <Download size={14} />
+              <span className="hidden sm:inline">Exportar CSV</span>
+            </Link>
+            <NewChargeModal clients={clients} />
+          </div>
+        }
+      />
 
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
         <div className="bg-white rounded-xl border border-gray-200 p-4">
@@ -83,9 +86,7 @@ export default async function FinanceiroPage() {
             <CheckCircle size={16} className="text-green-600" />
             <span className="text-xs text-gray-500">Recebido no mês</span>
           </div>
-          <p className="text-base sm:text-xl font-bold text-gray-900">
-            R$ {totalPaid.toFixed(2).replace(".", ",")}
-          </p>
+          <p className="text-base sm:text-xl font-bold text-gray-900">{formatCurrencyBR(totalPaid)}</p>
           <p className="text-xs text-gray-400">{paid?._count ?? 0} pagamentos</p>
         </div>
 
@@ -94,9 +95,7 @@ export default async function FinanceiroPage() {
             <Clock size={16} className="text-amber-500" />
             <span className="text-xs text-gray-500">A receber</span>
           </div>
-          <p className="text-base sm:text-xl font-bold text-gray-900">
-            R$ {totalPending.toFixed(2).replace(".", ",")}
-          </p>
+          <p className="text-base sm:text-xl font-bold text-gray-900">{formatCurrencyBR(totalPending)}</p>
           <p className="text-xs text-gray-400">{pendingCount} pendentes</p>
         </div>
 
@@ -105,9 +104,7 @@ export default async function FinanceiroPage() {
             <TrendingUp size={16} className="text-violet-600" />
             <span className="text-xs text-gray-500">Total previsto</span>
           </div>
-          <p className="text-base sm:text-xl font-bold text-gray-900">
-            R$ {(totalPaid + totalPending).toFixed(2).replace(".", ",")}
-          </p>
+          <p className="text-base sm:text-xl font-bold text-gray-900">{formatCurrencyBR(totalPaid + totalPending)}</p>
           <p className="text-xs text-gray-400">recebido + pendente</p>
         </div>
       </div>
@@ -129,9 +126,7 @@ export default async function FinanceiroPage() {
           </h3>
         </div>
         {payments.length === 0 ? (
-          <div className="p-8 text-center text-gray-400 text-sm">
-            Nenhum pagamento registrado ainda.
-          </div>
+          <EmptyState title="Nenhum pagamento registrado ainda." padded />
         ) : (
           <div className="divide-y divide-gray-50">
             {payments.map((p) => (
@@ -148,10 +143,8 @@ export default async function FinanceiroPage() {
                   </p>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className="text-sm font-semibold text-gray-900">
-                    R$ {p.amount.toFixed(2).replace(".", ",")}
-                  </span>
-                  <PaymentStatusBadge status={p.status} />
+                  <span className="text-sm font-semibold text-gray-900">{formatCurrencyBR(p.amount)}</span>
+                  <StatusBadge status={p.status} map={PAYMENT_STATUS} />
                   <PaymentRowActions paymentId={p.id} status={p.status} />
                 </div>
               </div>
@@ -161,15 +154,4 @@ export default async function FinanceiroPage() {
       </div>
     </div>
   );
-}
-
-function PaymentStatusBadge({ status }: { status: string }) {
-  const map: Record<string, { label: string; className: string }> = {
-    PENDING: { label: "Pendente", className: "bg-amber-100 text-amber-700" },
-    SENT: { label: "Enviado", className: "bg-blue-100 text-blue-700" },
-    PAID: { label: "Pago", className: "bg-green-100 text-green-700" },
-    OVERDUE: { label: "Vencido", className: "bg-red-100 text-red-600" },
-  };
-  const s = map[status] ?? { label: status, className: "bg-gray-100 text-gray-600" };
-  return <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${s.className}`}>{s.label}</span>;
 }

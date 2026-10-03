@@ -18,6 +18,8 @@ import { NewAppointmentModal } from "@/components/new-appointment-modal";
 import { AppointmentActions } from "@/components/appointment-actions";
 import { ClearAgendaButton } from "@/components/clear-agenda-button";
 import { BlockSlotModal } from "@/components/block-slot-modal";
+import { StatusBadge } from "@/components/status-badge";
+import { APPOINTMENT_STATUS } from "@/lib/status-labels";
 
 const WORK_HOURS = Array.from({ length: 14 }, (_, i) => i + 7); // 7h–20h
 
@@ -232,7 +234,7 @@ export default async function AgendaPage({
                           </div>
                         </div>
                         <div className="flex items-center gap-2 flex-wrap ml-4 sm:ml-0 sm:shrink-0">
-                          <StatusBadge status={appt.status} />
+                          <StatusBadge status={appt.status} map={APPOINTMENT_STATUS} />
                           <AppointmentActions
                             appointmentId={appt.id}
                             status={
@@ -403,7 +405,7 @@ export default async function AgendaPage({
                         </div>
                       </div>
                       <div className="flex items-center gap-2 flex-wrap sm:shrink-0 pl-16 sm:pl-0">
-                        <StatusBadge status={appt.status} />
+                        <StatusBadge status={appt.status} map={APPOINTMENT_STATUS} />
                         <AppointmentActions
                           appointmentId={appt.id}
                           status={
@@ -424,22 +426,5 @@ export default async function AgendaPage({
         })}
       </div>
     </div>
-  );
-}
-
-function StatusBadge({ status }: { status: string }) {
-  const map: Record<string, { label: string; className: string }> = {
-    SCHEDULED: { label: "Agendado", className: "bg-blue-100 text-blue-700" },
-    CONFIRMED: { label: "Confirmado", className: "bg-green-100 text-green-700" },
-    DONE: { label: "Concluído", className: "bg-gray-100 text-gray-600" },
-    CANCELLED: { label: "Cancelado", className: "bg-red-100 text-red-600" },
-  };
-  const s = map[status] ?? { label: status, className: "bg-gray-100 text-gray-600" };
-  return (
-    <span
-      className={`text-xs px-2 py-0.5 rounded-full font-medium shrink-0 ${s.className}`}
-    >
-      {s.label}
-    </span>
   );
 }

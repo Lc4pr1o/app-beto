@@ -7,6 +7,10 @@ import { MessageSquare } from "lucide-react";
 import { getSettings } from "@/lib/settings";
 import { MessageSettingsForm } from "@/components/message-settings-form";
 import { MessageTriggerButtons } from "@/components/message-trigger-buttons";
+import { PageHeader } from "@/components/page-header";
+import { StatusBadge } from "@/components/status-badge";
+import { MESSAGE_TYPE } from "@/lib/status-labels";
+import { EmptyState } from "@/components/empty-state";
 
 export default async function MensagensPage() {
   const [logs, settings] = await Promise.all([
@@ -28,12 +32,7 @@ export default async function MensagensPage() {
 
   return (
     <div className="p-3 sm:p-6 max-w-4xl mx-auto">
-      <div className="mb-6 flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900">Mensagens</h2>
-          <p className="text-gray-500 text-sm">Histórico e configurações de envio via WhatsApp</p>
-        </div>
-      </div>
+      <PageHeader title="Mensagens" subtitle="Histórico e configurações de envio via WhatsApp" />
 
       <div className="mb-6">
         <MessageTriggerButtons />
@@ -70,9 +69,7 @@ export default async function MensagensPage() {
           </h3>
         </div>
         {logs.length === 0 ? (
-          <div className="p-8 text-center text-gray-400 text-sm">
-            Nenhuma mensagem enviada ainda.
-          </div>
+          <EmptyState title="Nenhuma mensagem enviada ainda." padded />
         ) : (
           <div className="divide-y divide-gray-50">
             {logs.map((log) => (
@@ -80,7 +77,7 @@ export default async function MensagensPage() {
                 <div className="flex items-center justify-between mb-1">
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-medium text-gray-800">{log.client.name}</span>
-                    <MessageTypeBadge type={log.type} />
+                    <StatusBadge status={log.type} map={MESSAGE_TYPE} />
                   </div>
                   <span className="text-xs text-gray-400">
                     {format(log.sentAt, "dd/MM/yyyy HH:mm", { locale: ptBR })}
@@ -94,15 +91,4 @@ export default async function MensagensPage() {
       </div>
     </div>
   );
-}
-
-function MessageTypeBadge({ type }: { type: string }) {
-  const map: Record<string, { label: string; className: string }> = {
-    CONFIRMATION: { label: "Confirmação", className: "bg-blue-100 text-blue-700" },
-    PAYMENT_LINK: { label: "Pagamento", className: "bg-amber-100 text-amber-700" },
-    REENGAGEMENT: { label: "Reengajamento", className: "bg-purple-100 text-purple-700" },
-    NO_SHOW: { label: "Não compareceu", className: "bg-orange-100 text-orange-700" },
-  };
-  const s = map[type] ?? { label: type, className: "bg-gray-100 text-gray-600" };
-  return <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${s.className}`}>{s.label}</span>;
 }

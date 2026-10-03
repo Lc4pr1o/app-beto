@@ -3,30 +3,27 @@ export const dynamic = "force-dynamic";
 import { prisma } from "@/lib/prisma";
 import { Clock, DollarSign, Package } from "lucide-react";
 import { NewServiceModal, EditServiceModal } from "@/components/service-modal";
+import { PageHeader } from "@/components/page-header";
+import { EmptyState } from "@/components/empty-state";
+import { formatCurrencyBR } from "@/lib/format";
 
 export default async function ServicosPage() {
   const services = await prisma.service.findMany({ orderBy: { name: "asc" } });
 
   return (
     <div className="p-3 sm:p-6 max-w-3xl mx-auto">
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900">Serviços</h2>
-          <p className="text-gray-500 text-sm">
-            {services.length} serviço{services.length !== 1 ? "s" : ""} cadastrado{services.length !== 1 ? "s" : ""}
-          </p>
-        </div>
-        <NewServiceModal />
-      </div>
+      <PageHeader
+        title="Serviços"
+        subtitle={`${services.length} serviço${services.length !== 1 ? "s" : ""} cadastrado${services.length !== 1 ? "s" : ""}`}
+        action={<NewServiceModal />}
+      />
 
       {services.length === 0 ? (
-        <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
-          <Package size={40} className="text-gray-300 mx-auto mb-3" />
-          <p className="text-gray-600 font-medium">Nenhum serviço cadastrado ainda.</p>
-          <p className="text-gray-400 text-sm mt-1">
-            Cadastre seus serviços para usar ao criar atendimentos.
-          </p>
-        </div>
+        <EmptyState
+          icon={<Package size={40} className="text-gray-300 mx-auto mb-3" />}
+          title="Nenhum serviço cadastrado ainda."
+          subtitle="Cadastre seus serviços para usar ao criar atendimentos."
+        />
       ) : (
         <div className="bg-white rounded-xl border border-gray-200 divide-y divide-gray-100">
           {services.map((service) => (
@@ -47,7 +44,7 @@ export default async function ServicosPage() {
                     </span>
                     <span className="text-xs text-gray-400 flex items-center gap-1">
                       <DollarSign size={10} />
-                      R$ {service.price.toFixed(2).replace(".", ",")}
+                      {formatCurrencyBR(service.price)}
                     </span>
                   </div>
                 </div>

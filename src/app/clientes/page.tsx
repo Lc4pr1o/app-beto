@@ -6,6 +6,8 @@ import { Users, Phone, Calendar, AlertCircle, UserPlus, Globe } from "lucide-rea
 import Link from "next/link";
 import { Suspense } from "react";
 import { ClientSearch } from "@/components/client-search";
+import { PageHeader } from "@/components/page-header";
+import { EmptyState } from "@/components/empty-state";
 
 export default async function ClientesPage({
   searchParams,
@@ -34,51 +36,51 @@ export default async function ClientesPage({
   return (
     <div className="p-3 sm:p-6 max-w-5xl mx-auto">
       <div className="mb-6">
-        <div className="flex items-center justify-between mb-3">
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900">Clientes</h2>
-            <p className="text-gray-500 text-sm">
-              {q
-                ? `${clients.length} resultado${clients.length !== 1 ? "s" : ""} para "${q}"`
-                : `${clients.length} cadastrado${clients.length !== 1 ? "s" : ""}`}
-            </p>
-          </div>
-          <div className="flex items-center gap-2">
-            <Link
-              href="/clientes/importar"
-              className="flex items-center gap-2 border border-gray-200 text-gray-600 px-3 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors"
-            >
-              <Globe size={15} className="text-blue-500" />
-              <span className="hidden sm:inline">Importar do Google</span>
-            </Link>
-            <Link
-              href="/clientes/novo"
-              className="flex items-center gap-2 bg-violet-600 text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-violet-700 transition-colors"
-            >
-              <UserPlus size={16} />
-              <span className="hidden sm:inline">Novo Cliente</span>
-            </Link>
-          </div>
-        </div>
+        <PageHeader
+          title="Clientes"
+          subtitle={
+            q
+              ? `${clients.length} resultado${clients.length !== 1 ? "s" : ""} para "${q}"`
+              : `${clients.length} cadastrado${clients.length !== 1 ? "s" : ""}`
+          }
+          className="mb-3"
+          action={
+            <div className="flex items-center gap-2">
+              <Link
+                href="/clientes/importar"
+                className="flex items-center gap-2 border border-gray-200 text-gray-600 px-3 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors"
+              >
+                <Globe size={15} className="text-blue-500" />
+                <span className="hidden sm:inline">Importar do Google</span>
+              </Link>
+              <Link
+                href="/clientes/novo"
+                className="flex items-center gap-2 bg-violet-600 text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-violet-700 transition-colors"
+              >
+                <UserPlus size={16} />
+                <span className="hidden sm:inline">Novo Cliente</span>
+              </Link>
+            </div>
+          }
+        />
         <Suspense fallback={null}>
           <ClientSearch defaultValue={q} />
         </Suspense>
       </div>
 
       {clients.length === 0 ? (
-        <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
-          <Users size={40} className="text-gray-300 mx-auto mb-3" />
-          {q ? (
-            <>
-              <p className="text-gray-600 font-medium">Nenhum cliente encontrado para &quot;{q}&quot;.</p>
-              <p className="text-gray-400 text-sm mt-1">Tente outro nome ou telefone.</p>
-            </>
-          ) : (
-            <>
-              <p className="text-gray-600 font-medium">Nenhum cliente cadastrado ainda.</p>
-              <p className="text-gray-400 text-sm mt-1 mb-5">
-                Cadastre o primeiro cliente para começar a agendar.
-              </p>
+        <EmptyState
+          icon={<Users size={40} className="text-gray-300 mx-auto mb-3" />}
+          title={q ? `Nenhum cliente encontrado para "${q}".` : "Nenhum cliente cadastrado ainda."}
+          subtitle={
+            q ? (
+              "Tente outro nome ou telefone."
+            ) : (
+              <span className="mb-5 block">Cadastre o primeiro cliente para começar a agendar.</span>
+            )
+          }
+          action={
+            !q && (
               <Link
                 href="/clientes/novo"
                 className="inline-flex items-center gap-2 bg-violet-600 text-white px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-violet-700 transition-colors"
@@ -86,9 +88,9 @@ export default async function ClientesPage({
                 <UserPlus size={15} />
                 Cadastrar primeiro cliente
               </Link>
-            </>
-          )}
-        </div>
+            )
+          }
+        />
       ) : (
         <div className="bg-white rounded-xl border border-gray-200 divide-y divide-gray-100">
           {clients.map((client) => {

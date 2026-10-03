@@ -7,6 +7,8 @@ import {
   DEFAULT_PAYMENT_TEMPLATE,
   DEFAULT_REENGAGEMENT_TEMPLATE,
 } from "@/lib/evolution";
+import { Button } from "@/components/button";
+import { Input, Textarea } from "@/components/input";
 
 type Settings = {
   confirmationTemplate: string | null;
@@ -119,26 +121,22 @@ export function MessageSettingsForm({ settings }: { settings: Settings }) {
 
       <div className="pt-2 border-t border-gray-100">
         <label className="text-xs text-gray-500 block mb-1">Meta de faturamento mensal (R$) — aparece no Dashboard</label>
-        <input
+        <Input
           type="number"
           min={0}
           step={100}
           value={form.monthlyGoal || ""}
           placeholder="Ex: 5000"
           onChange={(e) => setForm((f) => ({ ...f, monthlyGoal: Number(e.target.value) }))}
-          className="w-full sm:w-48 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-300"
+          className="sm:w-48"
         />
       </div>
 
       <div className="flex items-center gap-3">
-        <button
-          onClick={handleSave}
-          disabled={saving}
-          className="flex items-center gap-2 bg-violet-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-violet-700 disabled:opacity-50 transition-colors"
-        >
+        <Button onClick={handleSave} disabled={saving} className="flex items-center gap-2">
           <Save size={14} />
           {saving ? "Salvando..." : "Salvar configurações"}
-        </button>
+        </Button>
         {saved && <span className="text-sm text-green-600">Salvo ✓</span>}
       </div>
     </div>
@@ -164,12 +162,12 @@ function TemplateField({
         <label className="text-sm font-medium text-gray-700">{label}</label>
         <span className="text-xs text-gray-400">{hint}</span>
       </div>
-      <textarea
+      <Textarea
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         rows={4}
-        className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-violet-300 resize-none"
+        className="font-mono"
       />
       {!value && <p className="text-xs text-gray-400 mt-1">Em branco = usa o texto padrão acima.</p>}
     </div>
@@ -188,13 +186,7 @@ function NumberField({
   return (
     <div>
       <label className="text-xs text-gray-500 block mb-1">{label}</label>
-      <input
-        type="number"
-        min={0}
-        value={value}
-        onChange={(e) => onChange(Number(e.target.value))}
-        className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-300"
-      />
+      <Input type="number" min={0} value={value} onChange={(e) => onChange(Number(e.target.value))} />
     </div>
   );
 }

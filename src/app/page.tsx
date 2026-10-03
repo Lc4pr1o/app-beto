@@ -6,6 +6,11 @@ import { SyncButton } from "@/components/sync-button";
 import { PaymentButton } from "@/components/payment-button";
 import { startOfTodayBR, endOfTodayBR, formatLongDateBR, formatTimeBR } from "@/lib/date";
 import { getSettings } from "@/lib/settings";
+import { formatCurrencyBR } from "@/lib/format";
+import { PageHeader } from "@/components/page-header";
+import { StatusBadge } from "@/components/status-badge";
+import { APPOINTMENT_STATUS } from "@/lib/status-labels";
+import { EmptyState } from "@/components/empty-state";
 
 async function getDashboardData() {
   const today = startOfTodayBR();
@@ -57,13 +62,11 @@ export default async function DashboardPage() {
 
   return (
     <div className="p-3 sm:p-6 max-w-5xl mx-auto">
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900">Dashboard</h2>
-          <p className="text-gray-500 text-sm capitalize">{formatLongDateBR()}</p>
-        </div>
-        <SyncButton />
-      </div>
+      <PageHeader
+        title="Dashboard"
+        subtitle={<span className="capitalize">{formatLongDateBR()}</span>}
+        action={<SyncButton />}
+      />
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         <StatCard
@@ -77,9 +80,7 @@ export default async function DashboardPage() {
             <DollarSign className="text-green-600" size={20} />
             <span className="text-xs text-gray-500">Receita do mês</span>
           </div>
-          <p className="text-base sm:text-xl font-bold text-gray-900">
-            R$ {monthRevenue.toFixed(2).replace(".", ",")}
-          </p>
+          <p className="text-base sm:text-xl font-bold text-gray-900">{formatCurrencyBR(monthRevenue)}</p>
           {goalPct !== null ? (
             <div className="mt-2">
               <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
@@ -115,7 +116,7 @@ export default async function DashboardPage() {
             Agenda de hoje
           </h3>
           {todayAppointments.length === 0 ? (
-            <p className="text-gray-400 text-sm">Nenhum atendimento hoje.</p>
+            <EmptyState title="Nenhum atendimento hoje." />
           ) : (
             <ul className="space-y-3">
               {todayAppointments.map((appt) => (
@@ -128,7 +129,7 @@ export default async function DashboardPage() {
                       {formatTimeBR(appt.startTime)} – {formatTimeBR(appt.endTime)}
                     </p>
                   </div>
-                  <StatusBadge status={appt.status} />
+                  <StatusBadge status={appt.status} map={APPOINTMENT_STATUS} />
                 </li>
               ))}
             </ul>
@@ -150,9 +151,7 @@ export default async function DashboardPage() {
                     <p className="font-medium text-gray-800 text-sm truncate">
                       {p.client?.name ?? <span className="text-gray-400 italic">Cliente excluído</span>}
                     </p>
-                    <p className="text-gray-400 text-xs">
-                      R$ {p.amount.toFixed(2).replace(".", ",")}
-                    </p>
+                    <p className="text-gray-400 text-xs">{formatCurrencyBR(p.amount)}</p>
                   </div>
                   {p.appointmentId && p.client && p.status === "PENDING" && (
                     <PaymentButton
@@ -191,20 +190,5 @@ function StatCard({
       <p className="text-xl font-bold text-gray-900">{value}</p>
       <p className="text-xs text-gray-400">{sub}</p>
     </div>
-  );
-}
-
-function StatusBadge({ status }: { status: string }) {
-  const map: Record<string, { label: string; className: string }> = {
-    SCHEDULED: { label: "Agendado", className: "bg-blue-100 text-blue-700" },
-    CONFIRMED: { label: "Confirmado", className: "bg-green-100 text-green-700" },
-    DONE: { label: "Concluído", className: "bg-gray-100 text-gray-600" },
-    CANCELLED: { label: "Cancelado", className: "bg-red-100 text-red-600" },
-  };
-  const s = map[status] ?? { label: status, className: "bg-gray-100 text-gray-600" };
-  return (
-    <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${s.className}`}>
-      {s.label}
-    </span>
   );
 }
