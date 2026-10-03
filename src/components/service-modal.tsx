@@ -3,6 +3,9 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { X, Plus, Pencil } from "lucide-react";
+import { Modal } from "@/components/modal";
+import { Button } from "@/components/button";
+import { Input } from "@/components/input";
 
 type Service = { id: string; name: string; durationMins: number; price: number; active: boolean };
 
@@ -45,46 +48,33 @@ function ServiceForm({
     <form onSubmit={handleSubmit} className="p-5 space-y-4">
       <div>
         <label className="block text-xs font-medium text-gray-600 mb-1.5">Nome do serviço</label>
-        <input
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="Ex: Massagem relaxante"
-          className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-violet-300"
-          required
-        />
+        <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Ex: Massagem relaxante" required />
       </div>
       <div className="grid grid-cols-2 gap-3">
         <div>
           <label className="block text-xs font-medium text-gray-600 mb-1.5">Duração (minutos)</label>
-          <input
+          <Input
             type="number"
             value={duration}
             onChange={(e) => setDuration(e.target.value)}
             min={5}
             step={5}
-            className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-violet-300"
             required
           />
         </div>
         <div>
           <label className="block text-xs font-medium text-gray-600 mb-1.5">Preço (R$)</label>
-          <input
-            value={price}
-            onChange={(e) => setPrice(e.target.value)}
-            placeholder="0,00"
-            className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-violet-300"
-            required
-          />
+          <Input value={price} onChange={(e) => setPrice(e.target.value)} placeholder="0,00" required />
         </div>
       </div>
       {error && <p className="text-xs text-red-600">{error}</p>}
       <div className="flex gap-2 pt-1">
-        <button type="button" onClick={onClose} className="flex-1 py-2 border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50">
+        <Button type="button" variant="secondary" onClick={onClose} className="flex-1 py-2">
           Cancelar
-        </button>
-        <button type="submit" disabled={loading} className="flex-1 py-2 bg-violet-600 text-white rounded-lg text-sm font-medium hover:bg-violet-700 disabled:opacity-50">
+        </Button>
+        <Button type="submit" disabled={loading} className="flex-1 py-2">
           {loading ? "Salvando..." : "Salvar"}
-        </button>
+        </Button>
       </div>
     </form>
   );
@@ -106,25 +96,20 @@ export function NewServiceModal() {
 
   return (
     <>
-      <button
-        onClick={() => setOpen(true)}
-        className="flex items-center gap-2 bg-violet-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-violet-700"
-      >
+      <Button onClick={() => setOpen(true)} className="flex items-center gap-2">
         <Plus size={16} />
         Novo Serviço
-      </button>
+      </Button>
       {open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm">
-            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
-              <h3 className="font-semibold text-gray-900 text-sm">Novo serviço</h3>
-              <button onClick={() => setOpen(false)} className="text-gray-400 hover:text-gray-600">
-                <X size={18} />
-              </button>
-            </div>
-            <ServiceForm onSave={handleSave} onClose={() => setOpen(false)} />
+        <Modal onClose={() => setOpen(false)} maxWidth="sm">
+          <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+            <h3 className="font-semibold text-gray-900 text-sm">Novo serviço</h3>
+            <button onClick={() => setOpen(false)} aria-label="Fechar" className="text-gray-400 hover:text-gray-600">
+              <X size={18} />
+            </button>
           </div>
-        </div>
+          <ServiceForm onSave={handleSave} onClose={() => setOpen(false)} />
+        </Modal>
       )}
     </>
   );
@@ -154,30 +139,29 @@ export function EditServiceModal({ service }: { service: Service }) {
     <>
       <button
         onClick={() => setOpen(true)}
+        aria-label="Editar serviço"
         className="p-1.5 text-gray-400 hover:text-violet-600 hover:bg-violet-50 rounded transition-colors"
       >
         <Pencil size={14} />
       </button>
       {open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm">
-            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
-              <h3 className="font-semibold text-gray-900 text-sm">Editar serviço</h3>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={handleDelete}
-                  className="text-xs text-red-500 hover:text-red-700 px-2 py-1 rounded hover:bg-red-50"
-                >
-                  Excluir
-                </button>
-                <button onClick={() => setOpen(false)} className="text-gray-400 hover:text-gray-600">
-                  <X size={18} />
-                </button>
-              </div>
+        <Modal onClose={() => setOpen(false)} maxWidth="sm">
+          <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+            <h3 className="font-semibold text-gray-900 text-sm">Editar serviço</h3>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handleDelete}
+                className="text-xs text-red-500 hover:text-red-700 px-2 py-1 rounded hover:bg-red-50"
+              >
+                Excluir
+              </button>
+              <button onClick={() => setOpen(false)} aria-label="Fechar" className="text-gray-400 hover:text-gray-600">
+                <X size={18} />
+              </button>
             </div>
-            <ServiceForm initial={service} onSave={handleSave} onClose={() => setOpen(false)} />
           </div>
-        </div>
+          <ServiceForm initial={service} onSave={handleSave} onClose={() => setOpen(false)} />
+        </Modal>
       )}
     </>
   );

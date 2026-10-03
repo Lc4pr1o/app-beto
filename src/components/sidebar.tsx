@@ -38,6 +38,7 @@ export function Sidebar() {
             <Link
               key={href}
               href={href}
+              aria-label={label}
               className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                 active
                   ? "bg-white text-violet-700"
@@ -53,6 +54,7 @@ export function Sidebar() {
 
       <button
         onClick={handleLogout}
+        aria-label="Sair"
         className="flex items-center gap-3 px-3 py-2.5 mx-2 rounded-lg text-sm font-medium text-violet-100 hover:bg-violet-600 transition-colors"
       >
         <LogOut size={18} className="shrink-0" />
