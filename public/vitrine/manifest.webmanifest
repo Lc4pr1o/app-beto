@@ -1,7 +1,9 @@
 {
   "name": "Bove Massoterapia",
   "short_name": "Bove",
+  "id": "/vitrine",
   "start_url": "/vitrine",
+  "scope": "/vitrine",
   "display": "standalone",
   "background_color": "#855E3E",
   "theme_color": "#855E3E",
