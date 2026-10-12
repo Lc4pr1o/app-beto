@@ -84,7 +84,6 @@ Em ordem de prioridade:
 4. **Bug de hidratação na inicial do avatar:** em `/clientes` e no detalhe do cliente, `client.name.charAt(0)` corta ao meio nomes que começam com emoji (ex.: "🌸 Dra Monica"). Use `Array.from(name)[0]`.
 5. **A lista de clientes carrega todos os 532 de uma vez** (~3 s no servidor de desenvolvimento). Precisa de paginação ou carregamento sob demanda.
 6. **Ícones "maskable" do PWA:** os que vieram no design não tinham margem de segurança e cortariam o logo no Android. Ficaram de fora; o manifest usa só os ícones normais.
-7. O `README.md` ainda é o padrão do `create-next-app`.
 
 ## Redesign do admin (em andamento)
 
